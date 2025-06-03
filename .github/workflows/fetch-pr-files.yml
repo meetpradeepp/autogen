@@ -9,3 +9,38 @@ on:
       - opened
       - synchronize
       - reopened
+jobs:
+  fetch_files:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Check out the PR’s code, so GitHub provides us with GITHUB_REF and workspace
+      - name: Checkout PR
+        uses: actions/checkout@v3
+        with:
+          # Make sure we fetch all history so git commands (if needed) have context
+          fetch-depth: 0
+
+      # 2) Set up Python (we’ll target 3.10 here; adjust as needed)
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # 3) Install PyGithub so we can talk to GitHub’s API in Python
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyGithub
+
+      # 4) Run our script (we’ll create this shortly)
+      - name: List changed files & fetch contents
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # PR number is automatically provided in the workflow event
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # e.g. "my-org/my-repo"
+          REPO_FULL: ${{ github.repository }}
+          # This is the GitHub‐provided branch name or SHA for the PR’s head
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python .github/scripts/get_pr_files.py
