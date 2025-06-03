@@ -1,0 +1,11 @@
+# .github/workflows/fetch-pr-files.yml
+name: Fetch PR Changed Files
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
