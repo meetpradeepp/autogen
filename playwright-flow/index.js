@@ -6,7 +6,8 @@ const axeSource = require('axe-core').source;
 
 module.exports = async function () {
   const url = 'https://www.google.com'; // Change to the URL you want to test
-
+  const steps = [];
+  
   // Launch browser
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
@@ -22,5 +23,12 @@ module.exports = async function () {
   await browser.close();
 
   // Return results in the expected format
-  return { axeResult, pa11yResult };
+  steps.push({
+    step: 'landing_page',
+    axeResult: axeResult,
+    pa11yResult: pa11yResult,
+  });
+  
+  // Return results for each step
+  return steps;
 };
