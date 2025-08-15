@@ -1,13 +1,15 @@
-// index.js (or main.js) for Git Flow
+// playwright-flow/index.js
+
 const playwright = require('playwright');
 const pa11y = require('pa11y');
 const axeSource = require('axe-core').source;
 
 module.exports = async function () {
+  const url = 'https://www.google.com'; // Change to the URL you want to test
+
+  // Launch browser
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
-  const url = 'https://google.com'; // Change to your test URL
-
   await page.goto(url, { waitUntil: 'networkidle' });
 
   // Run axe-core
@@ -19,5 +21,6 @@ module.exports = async function () {
 
   await browser.close();
 
+  // Return results in the expected format
   return { axeResult, pa11yResult };
 };
