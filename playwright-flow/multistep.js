@@ -27,7 +27,8 @@ module.exports = async function () {
   const landingResults = await evaluateAccessibility(page, url);
 
   // Perform a search for "T-Mobile"
-  await page.fill('input[name="q"]', 'T-Mobile');
+  await page.getByRole('combobox', { name: 'Search' }).click();
+  await page.getByRole('combobox', { name: 'Search' }).fill('T-Mobile');
   await Promise.all([
     page.keyboard.press('Enter'),
     page.waitForNavigation({ waitUntil: 'networkidle' }),
