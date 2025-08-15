@@ -17,16 +17,22 @@ async function evaluateAccessibility(page, url) {
 
 module.exports = async function () {
   const url = 'https://www.google.com'; // Change to the URL you want to test
+  const steps = [];
 
   // Launch browser
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
 
-  // Evaluate accessibility on the landing page
+  // Step 1: Evaluate accessibility on the landing page
   const landingResults = await evaluateAccessibility(page, url);
+  steps.push({
+    step: 'landing_page',
+    axeResult: landingResults.axeResult,
+    pa11yResult: landingResults.pa11yResult,
+  });
 
-  // Perform a search for "T-Mobile"
+  // Step 2: Perform a search for "T-Mobile"
   await page.getByRole('combobox', { name: 'Search' }).click();
   await page.getByRole('combobox', { name: 'Search' }).fill('T-Mobile');
   await Promise.all([
@@ -37,11 +43,16 @@ module.exports = async function () {
   // Get the current URL after search
   const searchUrl = page.url();
 
-  // Evaluate accessibility on the search results page
+  // Step 3: Evaluate accessibility on the search results page
   const searchResults = await evaluateAccessibility(page, searchUrl);
+  steps.push({
+    step: 'search_results_page',
+    axeResult: searchResults.axeResult,
+    pa11yResult: searchResults.pa11yResult,
+  });
 
   await browser.close();
 
-  // Return results for both steps
-  return { landingResults, searchResults };
+  // Return results for each step
+  return steps;
 };
