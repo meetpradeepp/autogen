@@ -16,7 +16,7 @@ async function evaluateAccessibility(page, url) {
 }
 
 module.exports = async function () {
-  const url = 'https://www.google.com'; // Change to the URL you want to test
+  const url = 'https://t-mobile.com'; // Change to the URL you want to test
   const steps = [];
 
   // Launch browser
@@ -33,8 +33,7 @@ module.exports = async function () {
   });
 
   // Step 2: Perform a search for "T-Mobile"
-  await page.getByRole('combobox', { name: 'Search' }).click();
-  await page.getByRole('combobox', { name: 'Search' }).fill('T-Mobile');
+  await page.getByRole('link', { name: 'Business', exact: true }).click();
   await Promise.all([
     page.keyboard.press('Enter'),
     page.waitForNavigation({ waitUntil: 'networkidle' }),
