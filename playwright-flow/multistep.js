@@ -22,7 +22,7 @@ module.exports = async function () {
   // Launch browser
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
-  await page.goto(url, { waitUntil: 'networkidle' });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
   // Step 1: Evaluate accessibility on the landing page
   const landingResults = await evaluateAccessibility(page, url);
