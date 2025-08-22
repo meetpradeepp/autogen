@@ -34,10 +34,6 @@ module.exports = async function () {
 
   // Step 2: Perform a click on "Practice"
   await page.getByRole('link', { name: 'Practice', exact: true }).click();
-  await Promise.all([
-    page.keyboard.press('Enter'),
-    page.waitForNavigation({ waitUntil: 'networkidle' }),
-  ]);
 
   // Get the current URL after click
   const searchUrl = page.url();
