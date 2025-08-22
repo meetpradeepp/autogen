@@ -32,17 +32,17 @@ module.exports = async function () {
     pa11yResult: landingResults.pa11yResult,
   });
 
-  // Step 2: Perform a search for "T-Mobile"
+  // Step 2: Perform a click on "Business"
   await page.getByRole('link', { name: 'Business', exact: true }).click();
   await Promise.all([
     page.keyboard.press('Enter'),
     page.waitForNavigation({ waitUntil: 'networkidle' }),
   ]);
 
-  // Get the current URL after search
+  // Get the current URL after "Business" click
   const searchUrl = page.url();
 
-  // Step 3: Evaluate accessibility on the search results page
+  // Step 3: Evaluate accessibility on the Business page
   const searchResults = await evaluateAccessibility(page, searchUrl);
   steps.push({
     step: 'search_results_page',
