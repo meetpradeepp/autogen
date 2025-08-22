@@ -11,6 +11,7 @@ module.exports = async function () {
   // Launch browser
   const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
+  page.setBypassCSP(true)
   await page.goto(url, { waitUntil: 'networkidle' });
 
   // Run axe-core
