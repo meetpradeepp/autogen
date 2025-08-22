@@ -16,7 +16,7 @@ async function evaluateAccessibility(page, url) {
 }
 
 module.exports = async function () {
-  const url = 'https://t-mobile.com'; // Change to the URL you want to test
+  const url = 'https://www.t-mobile.com/'; // Change to the URL you want to test
   const steps = [];
 
   // Launch browser
