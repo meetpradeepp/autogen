@@ -18,7 +18,7 @@ console.log('Axe-core keys:', Object.keys(axe));
   await page.goto(url);
 
    // Run axe-core accessibility checks using AxeBuilder
-  const results = await new AxeBuilder({ page }).analyze();
+  const axeResult = await new AxeBuilder({ page }).analyze();
   
   // Run pa11y
   const pa11yResult = await pa11y(url);
