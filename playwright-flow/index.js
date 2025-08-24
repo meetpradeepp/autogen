@@ -5,8 +5,6 @@ const { chromium } = require('playwright');
 const pa11y = require('pa11y');
 const { AxeBuilder } = require('@axe-core/playwright');
 
-const axe = require('@axe-core/playwright');
-console.log('Axe-core keys:', Object.keys(axe));
 
 (async () => {
   const url = 'https://google.com'; // Change to the URL you want to test
