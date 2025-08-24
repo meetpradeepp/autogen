@@ -15,7 +15,7 @@ console.log('Axe-core keys:', Object.keys(axe));
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(url);
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
    // Run axe-core accessibility checks using AxeBuilder
   const axeResult = await new AxeBuilder({ page }).analyze();
