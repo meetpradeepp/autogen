@@ -1,15 +1,13 @@
 // playwright-flow/index.js
-
-// index.js (or main.js)
 // Requires: playwright, @axe-core/playwright, pa11ty
 
 const { chromium } = require('playwright');
 const pa11y = require('pa11y');
-const { injectAxe, getAxeResults } = require('@axe-core/playwright');
+const { AxeBuilder } = require('@axe-core/playwright');
 
 const axe = require('@axe-core/playwright');
 console.log('Axe-core keys:', Object.keys(axe));
-/*
+
 (async () => {
   const url = 'https://www.google.com'; // Change to the URL you want to test
   const steps = [];
@@ -18,9 +16,8 @@ console.log('Axe-core keys:', Object.keys(axe));
   const page = await browser.newPage();
   await page.goto(url);
 
-  // Run axe
-  await injectAxe(page);
-  const axeResult = await getAxeResults(page);
+   // Run axe-core accessibility checks using AxeBuilder
+  const results = await new AxeBuilder({ page }).analyze();
   
   // Run pa11y
   const pa11yResult = await pa11y(url);
