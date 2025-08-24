@@ -2,7 +2,7 @@
 
 const playwright = require('playwright');
 const pa11y = require('pa11y');
-const { injectAxe, getViolations } = require('playwright-axe');
+const { injectAxe, getViolations } = require('axe-playwright');
 
 module.exports = async function () {
   const url = 'https://www.google.com'; // Change to the URL you want to test
