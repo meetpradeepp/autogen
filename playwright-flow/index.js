@@ -13,7 +13,8 @@ console.log('Axe-core keys:', Object.keys(axe));
   const steps = [];
   
   const browser = await chromium.launch();
-  const page = await browser.newPage();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   await page.goto(url);
 
    // Run axe-core accessibility checks using AxeBuilder
