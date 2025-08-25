@@ -6,14 +6,14 @@ const pa11y = require('pa11y');
 const { AxeBuilder } = require('@axe-core/playwright');
 
 
-(async () => {
+module.exports = async function () {
   const url = 'https://google.com'; // Change to the URL you want to test
   const steps = [];
   
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(url, { waitUntil: 'networkidle' });
 
    // Run axe-core accessibility checks using AxeBuilder
   const axeResult = await new AxeBuilder({ page }).analyze();
@@ -31,7 +31,7 @@ const { AxeBuilder } = require('@axe-core/playwright');
     pa11yResult: pa11yResult,
   });
   
-  // Print results as JSON to stdout
-  console.log(JSON.stringify(steps));
-})();
+  // Return results for each step
+  return steps;
+};
 
