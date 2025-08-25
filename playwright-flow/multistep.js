@@ -25,7 +25,7 @@ module.exports = async function () {
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto(url, { waitUntil: 'networkidle' });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
 
   // Step 1: Evaluate accessibility on the landing page
