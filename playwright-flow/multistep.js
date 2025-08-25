@@ -17,20 +17,14 @@ async function evaluateAccessibility(page, url) {
   return { axeResult, pa11yResult };
 }
 
-async launchBrowser(){
-  const browser = await playwright.chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  return page;
-}
-
-
 module.exports = async function () {
   const url = 'https://www.t-mobile.com/'; // Change to the URL you want to test
   const steps = [];
 
   // Launch browser
-  const page = await launchBrowser();
+  const browser = await playwright.chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
 
 
