@@ -2,8 +2,6 @@
 
 const playwright = require('playwright');
 const pa11y = require('pa11y');
-const playwright = require('playwright');
-const pa11y = require('pa11y');
 const { AxeBuilder } = require('@axe-core/playwright');
 
 /**
