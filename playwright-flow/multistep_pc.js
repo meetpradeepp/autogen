@@ -7,7 +7,7 @@ const { AxeBuilder } = require('@axe-core/playwright');
 async function evaluateAccessibility(page, url) {
   // Run axe-core
   const scanResult = await new AxeBuilder({ page }).analyze();
-  const axeResult  = scanResult.violations;
+  const axeResult  = scanResult;
   // Run pa11y
   const pa11yResult = await pa11y(url);
 
