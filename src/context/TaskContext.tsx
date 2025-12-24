@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { TaskState, TaskAction } from '../modules/todo/types';
-import { taskReducer, initialState, loadTasks } from '../modules/todo/reducer';
+import { taskReducer, initialState, loadState } from '../modules/todo/reducer';
 
 interface TaskContextValue {
   state: TaskState;
@@ -12,11 +12,11 @@ const TaskContext = createContext<TaskContextValue | undefined>(undefined);
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
 
-  // Load tasks from localStorage on mount
+  // Load state from localStorage on mount
   useEffect(() => {
-    const storedTasks = loadTasks();
-    if (storedTasks.length > 0) {
-      dispatch({ type: 'LOAD_TASKS', payload: storedTasks });
+    const loadedState = loadState();
+    if (loadedState.lists.length > 0 || loadedState.tasks.length > 0) {
+      dispatch({ type: 'LOAD_STATE', payload: loadedState });
     }
   }, []);
 
