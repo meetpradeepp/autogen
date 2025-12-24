@@ -1,0 +1,80 @@
+.taskItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  transition: box-shadow 0.2s;
+}
+
+.taskItem:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.badge.high {
+  background: #fee;
+  color: #c53030;
+  border: 1px solid #fc8181;
+}
+
+.badge.medium {
+  background: #fef5e7;
+  color: #d97706;
+  border: 1px solid #fbbf24;
+}
+
+.badge.low {
+  background: #e6f7ff;
+  color: #1e40af;
+  border: 1px solid #60a5fa;
+}
+
+.description {
+  margin: 0;
+  font-size: 1rem;
+  color: #2d3748;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  flex: 1;
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: #a0aec0;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.deleteButton:hover {
+  background: #fee;
+  color: #e53e3e;
+}
+
+.deleteButton:active {
+  transform: scale(0.95);
+}
