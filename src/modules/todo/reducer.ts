@@ -249,8 +249,8 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       // Handle active list switching if the deleted list was active
       let newActiveListId = state.activeListId;
       if (state.activeListId === listIdToDelete) {
-        // Switch to the first available list
-        newActiveListId = updatedLists.length > 0 ? updatedLists[0].id : null;
+        // Switch to the first available list (guaranteed to exist due to guard above)
+        newActiveListId = updatedLists[0].id;
       }
 
       const newState = {

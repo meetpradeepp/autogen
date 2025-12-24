@@ -77,7 +77,7 @@
 }
 
 .deleteButton:hover {
-  opacity: 1 !important;
+  opacity: 1;
   background: rgba(0, 0, 0, 0.1);
 }
 
