@@ -74,7 +74,18 @@ export function Sidebar() {
               aria-label={`Delete ${list.name}`}
               title="Delete list"
             >
-              🗑️
+              <svg 
+                width="14" 
+                height="14" 
+                viewBox="0 0 16 16" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
+                  fill="currentColor"
+                />
+              </svg>
             </button>
           </div>
         ))}

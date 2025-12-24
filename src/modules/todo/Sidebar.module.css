@@ -65,11 +65,14 @@
   padding: 0.25rem 0.5rem;
   background: transparent;
   border: none;
-  font-size: 1.1rem;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #718096;
 }
 
 .listItem:hover .deleteButton {
@@ -79,6 +82,11 @@
 .deleteButton:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.1);
+  color: #e53e3e;
+}
+
+.listItem.active .deleteButton {
+  color: white;
 }
 
 .listItem.active .deleteButton:hover {
