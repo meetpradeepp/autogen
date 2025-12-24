@@ -9,17 +9,30 @@ export function TaskList() {
     dispatch({ type: 'DELETE_TASK', payload: id });
   };
 
-  if (state.tasks.length === 0) {
+  // Filter tasks for the active list only
+  const activeTasks = state.activeListId
+    ? state.tasks.filter(task => task.listId === state.activeListId)
+    : [];
+
+  if (!state.activeListId) {
     return (
       <div className={styles.empty}>
-        <p>No tasks yet. Add your first task above!</p>
+        <p>No list selected. Create or select a list to get started!</p>
+      </div>
+    );
+  }
+
+  if (activeTasks.length === 0) {
+    return (
+      <div className={styles.empty}>
+        <p>No tasks in this list yet.</p>
       </div>
     );
   }
 
   return (
     <div className={styles.taskList}>
-      {state.tasks.map((task) => (
+      {activeTasks.map((task) => (
         <TaskItem key={task.id} task={task} onDelete={handleDelete} />
       ))}
     </div>
