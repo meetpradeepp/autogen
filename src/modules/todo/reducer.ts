@@ -229,6 +229,42 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       };
     }
 
+    case 'DELETE_LIST': {
+      // Prevent deletion of the last list
+      if (state.lists.length <= 1) {
+        return {
+          ...state,
+          error: 'Cannot delete the last list',
+        };
+      }
+
+      const listIdToDelete = action.payload;
+      
+      // Remove the list from lists array
+      const updatedLists = state.lists.filter(list => list.id !== listIdToDelete);
+      
+      // Remove all tasks associated with this list (prevent orphaned tasks)
+      const updatedTasks = state.tasks.filter(task => task.listId !== listIdToDelete);
+      
+      // Handle active list switching if the deleted list was active
+      let newActiveListId = state.activeListId;
+      if (state.activeListId === listIdToDelete) {
+        // Switch to the first available list
+        newActiveListId = updatedLists.length > 0 ? updatedLists[0].id : null;
+      }
+
+      const newState = {
+        ...state,
+        lists: updatedLists,
+        tasks: updatedTasks,
+        activeListId: newActiveListId,
+        error: null,
+      };
+      
+      saveState(newState);
+      return newState;
+    }
+
     case 'LOAD_STATE': {
       return action.payload;
     }
