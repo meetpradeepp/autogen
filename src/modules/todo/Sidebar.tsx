@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect, useRef } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import styles from './Sidebar.module.css';
 
@@ -6,15 +6,21 @@ export function Sidebar() {
   const { state, dispatch } = useTaskContext();
   const [newListName, setNewListName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const previousListCountRef = useRef(state.lists.length);
+
+  // Close form when a list is successfully created
+  useEffect(() => {
+    if (state.lists.length > previousListCountRef.current && !state.error) {
+      setNewListName('');
+      setIsCreating(false);
+    }
+    previousListCountRef.current = state.lists.length;
+  }, [state.lists.length, state.error]);
 
   const handleCreateList = (e: FormEvent) => {
     e.preventDefault();
     if (newListName.trim()) {
       dispatch({ type: 'CREATE_LIST', payload: newListName });
-      if (!state.error) {
-        setNewListName('');
-        setIsCreating(false);
-      }
     }
   };
 
