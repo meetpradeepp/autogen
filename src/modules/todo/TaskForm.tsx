@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect, useRef } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { Priority } from '../todo/types';
 import styles from './TaskForm.module.css';
@@ -7,6 +7,16 @@ export function TaskForm() {
   const { state, dispatch } = useTaskContext();
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
+  const previousTaskCountRef = useRef(state.tasks.length);
+
+  // Clear form when a task is successfully added
+  useEffect(() => {
+    if (state.tasks.length > previousTaskCountRef.current && !state.error) {
+      setDescription('');
+      setPriority('medium');
+    }
+    previousTaskCountRef.current = state.tasks.length;
+  }, [state.tasks.length, state.error]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -18,12 +28,6 @@ export function TaskForm() {
         priority,
       },
     });
-
-    // Clear form only if no error occurred
-    if (!state.error) {
-      setDescription('');
-      setPriority('medium');
-    }
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {

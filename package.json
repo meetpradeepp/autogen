@@ -1,7 +1,7 @@
 {
   "name": "autogen",
   "version": "1.0.0",
-  "description": "THis is a readme update. Planning to merge using pull request with main.",
+  "description": "Task management application with priority levels and local persistence",
   "main": "index.js",
   "type": "module",
   "scripts": {
