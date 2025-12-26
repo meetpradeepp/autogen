@@ -1,22 +1,29 @@
 import React, { useState, FormEvent, useEffect, useRef } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
+import { useToast } from '../../context/ToastContext';
 import { Priority } from '../todo/types';
 import styles from './TaskForm.module.css';
 
 export function TaskForm() {
   const { state, dispatch } = useTaskContext();
+  const { showToast } = useToast();
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const previousTaskCountRef = useRef(state.tasks.length);
 
   // Clear form when a task is successfully added
   useEffect(() => {
-    if (state.tasks.length > previousTaskCountRef.current && !state.error) {
+    if (state.tasks.length > previousTaskCountRef.current && !state.error && state.tasks.length > 0) {
+      const newTask = state.tasks[0]; // New tasks are prepended
+      const truncatedDesc = newTask.description.length > 50 
+        ? newTask.description.substring(0, 50) + '...' 
+        : newTask.description;
+      showToast(`Task '${truncatedDesc}' added`);
       setDescription('');
       setPriority('medium');
     }
     previousTaskCountRef.current = state.tasks.length;
-  }, [state.tasks.length, state.error]);
+  }, [state.tasks.length, state.error, state.tasks, showToast]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

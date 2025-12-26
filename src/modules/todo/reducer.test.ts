@@ -282,14 +282,15 @@ describe('taskReducer', () => {
       expect(newState.error).toBeNull();
     });
 
-    it('should prevent deletion of the last list', () => {
+    it('should allow deletion of the last list (zero-list state)', () => {
       const state = createStateWithList();
       const action = { type: 'DELETE_LIST' as const, payload: state.lists[0].id };
 
       const newState = taskReducer(state, action);
 
-      expect(newState.lists).toHaveLength(1);
-      expect(newState.error).toBe('Cannot delete the last list');
+      expect(newState.lists).toHaveLength(0);
+      expect(newState.activeListId).toBeNull();
+      expect(newState.error).toBeNull();
     });
 
     it('should switch active list when deleting the active list', () => {
