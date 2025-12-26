@@ -13,7 +13,7 @@ export function TaskForm() {
 
   // Clear form when a task is successfully added
   useEffect(() => {
-    if (state.tasks.length > previousTaskCountRef.current && !state.error) {
+    if (state.tasks.length > previousTaskCountRef.current && !state.error && state.tasks.length > 0) {
       const newTask = state.tasks[0]; // New tasks are prepended
       const truncatedDesc = newTask.description.length > 50 
         ? newTask.description.substring(0, 50) + '...' 

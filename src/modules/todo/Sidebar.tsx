@@ -12,7 +12,7 @@ export function Sidebar() {
 
   // Close form when a list is successfully created
   useEffect(() => {
-    if (state.lists.length > previousListCountRef.current && !state.error) {
+    if (state.lists.length > previousListCountRef.current && !state.error && state.lists.length > 0) {
       const newList = state.lists[state.lists.length - 1];
       showToast(`List '${newList.name}' created`);
       setNewListName('');

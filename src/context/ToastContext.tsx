@@ -2,16 +2,13 @@ import { createContext, useContext, useState, useCallback, useEffect, ReactNode 
 import styles from './Toast.module.css';
 
 /**
- * Sanitize user input for display (defense-in-depth)
- * React's JSX already escapes HTML, but this provides explicit protection
+ * Truncate message for display to prevent layout issues
  */
-function sanitizeForDisplay(input: string): string {
-  return input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .substring(0, 200); // Hard limit for display
+function truncateMessage(message: string, maxLength: number = 200): string {
+  if (message.length <= maxLength) {
+    return message;
+  }
+  return message.substring(0, maxLength) + '...';
 }
 
 interface Toast {
@@ -100,7 +97,8 @@ function Toast({ message, onDismiss }: ToastProps) {
         fontSize: '14px',
         fontWeight: 500,
       }}
-      dangerouslySetInnerHTML={{ __html: sanitizeForDisplay(message) }}
-    />
+    >
+      {truncateMessage(message)}
+    </div>
   );
 }
