@@ -1,9 +1,11 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
+import { useToast } from '../../context/ToastContext';
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {
   const { state, dispatch } = useTaskContext();
+  const { showToast } = useToast();
   const [newListName, setNewListName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const previousListCountRef = useRef(state.lists.length);
@@ -11,11 +13,13 @@ export function Sidebar() {
   // Close form when a list is successfully created
   useEffect(() => {
     if (state.lists.length > previousListCountRef.current && !state.error) {
+      const newList = state.lists[state.lists.length - 1];
+      showToast(`List '${newList.name}' created`);
       setNewListName('');
       setIsCreating(false);
     }
     previousListCountRef.current = state.lists.length;
-  }, [state.lists.length, state.error]);
+  }, [state.lists.length, state.error, state.lists, showToast]);
 
   const handleCreateList = (e: FormEvent) => {
     e.preventDefault();
@@ -39,6 +43,7 @@ export function Sidebar() {
     
     if (confirmed) {
       dispatch({ type: 'DELETE_LIST', payload: listId });
+      showToast(`List '${listName}' deleted`);
     }
   };
 

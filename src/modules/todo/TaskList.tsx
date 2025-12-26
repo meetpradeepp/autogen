@@ -1,12 +1,15 @@
 import { useTaskContext } from '../../context/TaskContext';
+import { useToast } from '../../context/ToastContext';
 import { TaskItem } from './TaskItem';
 import styles from './TaskList.module.css';
 
 export function TaskList() {
   const { state, dispatch } = useTaskContext();
+  const { showToast } = useToast();
 
   const handleDelete = (id: string) => {
     dispatch({ type: 'DELETE_TASK', payload: id });
+    showToast('Task deleted');
   };
 
   // Filter tasks for the active list only
@@ -17,7 +20,7 @@ export function TaskList() {
   if (!state.activeListId) {
     return (
       <div className={styles.empty}>
-        <p>No list selected. Create or select a list to get started!</p>
+        <p>No lists yet. Create one to get started!</p>
       </div>
     );
   }
