@@ -1,6 +1,19 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import styles from './Toast.module.css';
 
+/**
+ * Sanitize user input for display (defense-in-depth)
+ * React's JSX already escapes HTML, but this provides explicit protection
+ */
+function sanitizeForDisplay(input: string): string {
+  return input
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .substring(0, 200); // Hard limit for display
+}
+
 interface Toast {
   id: string;
   message: string;
@@ -52,11 +65,16 @@ function Toast({ message, onDismiss }: ToastProps) {
   useEffect(() => {
     const dismissTimer = setTimeout(() => {
       setIsExiting(true);
-      // Wait for fade-out animation before removing from DOM
-      setTimeout(onDismiss, 300);
     }, 3000);
 
-    return () => clearTimeout(dismissTimer);
+    const removeTimer = setTimeout(() => {
+      onDismiss();
+    }, 3300);
+
+    return () => {
+      clearTimeout(dismissTimer);
+      clearTimeout(removeTimer);
+    };
   }, [onDismiss]);
 
   return (
@@ -82,8 +100,7 @@ function Toast({ message, onDismiss }: ToastProps) {
         fontSize: '14px',
         fontWeight: 500,
       }}
-    >
-      {message}
-    </div>
+      dangerouslySetInnerHTML={{ __html: sanitizeForDisplay(message) }}
+    />
   );
 }
