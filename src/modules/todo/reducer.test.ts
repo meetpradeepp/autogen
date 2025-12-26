@@ -248,6 +248,132 @@ describe('taskReducer', () => {
     });
   });
 
+  describe('DELETE_LIST action', () => {
+    it('should delete a list and all associated tasks', () => {
+      const list1: TodoList = {
+        id: 'list-1',
+        name: 'List 1',
+        createdAt: Date.now(),
+      };
+      const list2: TodoList = {
+        id: 'list-2',
+        name: 'List 2',
+        createdAt: Date.now(),
+      };
+      const state: TaskState = {
+        lists: [list1, list2],
+        tasks: [
+          { id: 't1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
+          { id: 't2', description: 'Task 2', priority: 'medium' as const, createdAt: Date.now(), listId: 'list-2' },
+          { id: 't3', description: 'Task 3', priority: 'low' as const, createdAt: Date.now(), listId: 'list-1' },
+        ],
+        activeListId: 'list-2',
+        error: null,
+      };
+
+      const action = { type: 'DELETE_LIST' as const, payload: 'list-1' };
+      const newState = taskReducer(state, action);
+
+      expect(newState.lists).toHaveLength(1);
+      expect(newState.lists[0].id).toBe('list-2');
+      expect(newState.tasks).toHaveLength(1);
+      expect(newState.tasks[0].id).toBe('t2');
+      expect(newState.activeListId).toBe('list-2');
+      expect(newState.error).toBeNull();
+    });
+
+    it('should prevent deletion of the last list', () => {
+      const state = createStateWithList();
+      const action = { type: 'DELETE_LIST' as const, payload: state.lists[0].id };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.lists).toHaveLength(1);
+      expect(newState.error).toBe('Cannot delete the last list');
+    });
+
+    it('should switch active list when deleting the active list', () => {
+      const list1: TodoList = {
+        id: 'list-1',
+        name: 'List 1',
+        createdAt: Date.now(),
+      };
+      const list2: TodoList = {
+        id: 'list-2',
+        name: 'List 2',
+        createdAt: Date.now(),
+      };
+      const state: TaskState = {
+        lists: [list1, list2],
+        tasks: [],
+        activeListId: 'list-1',
+        error: null,
+      };
+
+      const action = { type: 'DELETE_LIST' as const, payload: 'list-1' };
+      const newState = taskReducer(state, action);
+
+      expect(newState.lists).toHaveLength(1);
+      expect(newState.activeListId).toBe('list-2');
+    });
+
+    it('should not change active list when deleting a non-active list', () => {
+      const list1: TodoList = {
+        id: 'list-1',
+        name: 'List 1',
+        createdAt: Date.now(),
+      };
+      const list2: TodoList = {
+        id: 'list-2',
+        name: 'List 2',
+        createdAt: Date.now(),
+      };
+      const state: TaskState = {
+        lists: [list1, list2],
+        tasks: [],
+        activeListId: 'list-1',
+        error: null,
+      };
+
+      const action = { type: 'DELETE_LIST' as const, payload: 'list-2' };
+      const newState = taskReducer(state, action);
+
+      expect(newState.lists).toHaveLength(1);
+      expect(newState.activeListId).toBe('list-1');
+    });
+
+    it('should update localStorage after deletion', () => {
+      const list1: TodoList = {
+        id: 'list-1',
+        name: 'List 1',
+        createdAt: Date.now(),
+      };
+      const list2: TodoList = {
+        id: 'list-2',
+        name: 'List 2',
+        createdAt: Date.now(),
+      };
+      const state: TaskState = {
+        lists: [list1, list2],
+        tasks: [
+          { id: 't1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
+        ],
+        activeListId: 'list-1',
+        error: null,
+      };
+
+      const action = { type: 'DELETE_LIST' as const, payload: 'list-1' };
+      taskReducer(state, action);
+
+      const stored = localStorage.getItem('taskManagerState');
+      expect(stored).toBeDefined();
+      const parsedState = JSON.parse(stored!);
+      expect(parsedState.lists).toHaveLength(1);
+      expect(parsedState.tasks).toHaveLength(0);
+      expect(parsedState.activeListId).toBe('list-2');
+    });
+  });
+
   describe('SET_ERROR action', () => {
     it('should set error message', () => {
       const state: TaskState = { lists: [], tasks: [], activeListId: null, error: null };

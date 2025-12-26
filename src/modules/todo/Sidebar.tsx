@@ -28,6 +28,20 @@ export function Sidebar() {
     dispatch({ type: 'SWITCH_LIST', payload: listId });
   };
 
+  const handleDeleteList = (listId: string, listName: string, e: React.MouseEvent) => {
+    // Prevent event bubbling to avoid selecting the list when clicking delete
+    e.stopPropagation();
+    
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${listName}"? This will permanently remove all tasks in this list.`
+    );
+    
+    if (confirmed) {
+      dispatch({ type: 'DELETE_LIST', payload: listId });
+    }
+  };
+
   const handleCancelCreate = () => {
     setNewListName('');
     setIsCreating(false);
@@ -42,15 +56,38 @@ export function Sidebar() {
 
       <nav className={styles.listNav}>
         {state.lists.map((list) => (
-          <button
+          <div
             key={list.id}
-            onClick={() => handleSwitchList(list.id)}
             className={`${styles.listItem} ${
               state.activeListId === list.id ? styles.active : ''
             }`}
           >
-            {list.name}
-          </button>
+            <button
+              onClick={() => handleSwitchList(list.id)}
+              className={styles.listButton}
+            >
+              {list.name}
+            </button>
+            <button
+              onClick={(e) => handleDeleteList(list.id, list.name, e)}
+              className={styles.deleteButton}
+              aria-label={`Delete ${list.name}`}
+              title="Delete list"
+            >
+              <svg 
+                width="14" 
+                height="14" 
+                viewBox="0 0 16 16" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
         ))}
       </nav>
 

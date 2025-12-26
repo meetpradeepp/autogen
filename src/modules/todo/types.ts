@@ -29,4 +29,5 @@ export type TaskAction =
   | { type: 'LOAD_TASKS'; payload: Task[] }
   | { type: 'CREATE_LIST'; payload: string }
   | { type: 'SWITCH_LIST'; payload: string }
+  | { type: 'DELETE_LIST'; payload: string }
   | { type: 'LOAD_STATE'; payload: TaskState };
