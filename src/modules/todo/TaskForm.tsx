@@ -31,7 +31,12 @@ export function TaskForm() {
     e.preventDefault();
     
     // Convert datetime-local string to timestamp if provided
-    const dueDateTimestamp = dueDate ? new Date(dueDate).getTime() : undefined;
+    // HTML5 datetime-local input ensures valid format, but validate conversion
+    let dueDateTimestamp: number | undefined;
+    if (dueDate) {
+      const timestamp = new Date(dueDate).getTime();
+      dueDateTimestamp = !isNaN(timestamp) ? timestamp : undefined;
+    }
     
     dispatch({
       type: 'ADD_TASK',
