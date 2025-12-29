@@ -1,3 +1,33 @@
+.container {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.sortButton {
+  padding: 0.5rem 1rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.sortButton:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.sortButton:active {
+  transform: translateY(1px);
+}
+
 .taskList {
   max-width: 100%;
 }

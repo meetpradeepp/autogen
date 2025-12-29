@@ -6,6 +6,7 @@ export interface Task {
   priority: Priority;
   createdAt: number;
   listId: string; // Reference to the list this task belongs to
+  dueDate?: number; // Optional due date timestamp
 }
 
 export interface TodoList {
@@ -22,7 +23,7 @@ export interface TaskState {
 }
 
 export type TaskAction =
-  | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId'> }
+  | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId'> & { dueDate?: number } }
   | { type: 'DELETE_TASK'; payload: string }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'CLEAR_ERROR' }

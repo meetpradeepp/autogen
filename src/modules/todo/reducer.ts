@@ -130,6 +130,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           priority: action.payload.priority,
           createdAt: Date.now(),
           listId: state.activeListId,
+          ...(action.payload.dueDate && { dueDate: action.payload.dueDate }),
         };
         const updatedTasks = [newTask, ...state.tasks];
         const newState = {
