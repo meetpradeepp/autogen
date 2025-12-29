@@ -9,6 +9,7 @@ export function TaskForm() {
   const { showToast } = useToast();
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
+  const [dueDate, setDueDate] = useState('');
   const previousTaskCountRef = useRef(state.tasks.length);
 
   // Clear form when a task is successfully added
@@ -21,6 +22,7 @@ export function TaskForm() {
       showToast(`Task '${truncatedDesc}' added`);
       setDescription('');
       setPriority('medium');
+      setDueDate('');
     }
     previousTaskCountRef.current = state.tasks.length;
   }, [state.tasks.length, state.error, state.tasks, showToast]);
@@ -28,11 +30,20 @@ export function TaskForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
+    // Convert datetime-local string to timestamp if provided
+    // HTML5 datetime-local input ensures valid format, but validate conversion
+    let dueDateTimestamp: number | undefined;
+    if (dueDate) {
+      const timestamp = new Date(dueDate).getTime();
+      dueDateTimestamp = !isNaN(timestamp) ? timestamp : undefined;
+    }
+    
     dispatch({
       type: 'ADD_TASK',
       payload: {
         description,
         priority,
+        dueDate: dueDateTimestamp,
       },
     });
   };
@@ -67,6 +78,14 @@ export function TaskForm() {
           <option value="medium">Medium</option>
           <option value="low">Low</option>
         </select>
+        
+        <input
+          type="datetime-local"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className={styles.dateInput}
+          aria-label="Task due date"
+        />
         
         <button type="submit" className={styles.button}>
           Add Task

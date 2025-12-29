@@ -14,10 +14,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.taskItem.overdue {
+  border: 2px solid #e53e3e;
+  background: #fff5f5;
+}
+
 .content {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex: 1;
+}
+
+.textContent {
   flex: 1;
 }
 
@@ -49,13 +58,31 @@
   border: 1px solid #60a5fa;
 }
 
+.overdueBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  background: #e53e3e;
+  color: white;
+  border: 1px solid #c53030;
+}
+
 .description {
   margin: 0;
   font-size: 1rem;
   color: #2d3748;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  flex: 1;
+}
+
+.dueDate {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: #718096;
 }
 
 .deleteButton {

@@ -149,6 +149,59 @@ describe('taskReducer', () => {
       expect(parsedState.tasks).toHaveLength(1);
       expect(parsedState.tasks[0].description).toBe('Persistent task');
     });
+
+    it('should add task with optional dueDate', () => {
+      const state = createStateWithList();
+      const dueDate = Date.now() + 86400000; // 1 day from now
+      const action = {
+        type: 'ADD_TASK' as const,
+        payload: { 
+          description: 'Task with due date', 
+          priority: 'high' as const,
+          dueDate,
+        },
+      };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.tasks).toHaveLength(1);
+      expect(newState.tasks[0].dueDate).toBe(dueDate);
+      expect(newState.error).toBeNull();
+    });
+
+    it('should add task without dueDate when not provided', () => {
+      const state = createStateWithList();
+      const action = {
+        type: 'ADD_TASK' as const,
+        payload: { description: 'Task without due date', priority: 'medium' as const },
+      };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.tasks).toHaveLength(1);
+      expect(newState.tasks[0].dueDate).toBeUndefined();
+      expect(newState.error).toBeNull();
+    });
+
+    it('should persist dueDate to localStorage', () => {
+      const state = createStateWithList();
+      const dueDate = Date.now() + 86400000;
+      const action = {
+        type: 'ADD_TASK' as const,
+        payload: { 
+          description: 'Persistent due date task', 
+          priority: 'low' as const,
+          dueDate,
+        },
+      };
+
+      taskReducer(state, action);
+
+      const stored = localStorage.getItem('taskManagerState');
+      expect(stored).toBeDefined();
+      const parsedState = JSON.parse(stored!);
+      expect(parsedState.tasks[0].dueDate).toBe(dueDate);
+    });
   });
 
   describe('DELETE_TASK action', () => {
