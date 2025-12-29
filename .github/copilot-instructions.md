@@ -20,6 +20,7 @@ At the start of **Phase 0**, you must determine and explicitly declare the execu
 - **FULL MODE** – For structural, architectural, or security-sensitive changes.
 
 ### Mode Selection Rules (Objective)
+
 **FULL MODE is mandatory if ANY apply:**
 - New dependency, framework, or library is introduced.
 - Schema or data model changes.
@@ -27,12 +28,16 @@ At the start of **Phase 0**, you must determine and explicitly declare the execu
 - New module, service, or architectural boundary.
 - Cross-layer refactor.
 - Performance, scalability, or security trade-offs.
+- Legacy modernization or migration work.
+- Enhancement changes externally observable behavior (API response, workflow outcome, business rule).
 
 **LIGHT MODE is allowed only if ALL apply:**
-- ≤ 2 existing files modified.
+- ≤ 4 files modified (Atomic Slice = changes limited to one vertical path (e.g., Controller → Service → Repo) for a single behavior).
 - No new dependencies.
 - No schema or auth changes.
 - No new public APIs.
+- Bug fix, test addition, or small localized enhancement.
+- Backward compatible (No breaking API changes & existing clients continue to function without modification).
 
 > *Execution mode is derived from **change risk**, not user preference.*
 
@@ -75,8 +80,19 @@ Do not proceed to the next gate until you receive user confirmation.
 3.  **Cross-Reference:** Ensure design complies with existing ADRs and patterns.
 
 **Actions (Mode-Aware):**
-* **FULL MODE:** Perform full architectural analysis. Trigger ADR drafting if applicable.
-* **LIGHT MODE:** Perform concise design reasoning. Skip ADR unless critical.
+																						 
+																			 
+
+**FULL MODE**
+- Perform full architectural analysis.
+- Trigger ADR drafting when applicable.
+- Produce a detailed design specification.
+
+**LIGHT MODE**
+- Perform concise design reasoning.
+- ADR usually not required (explicitly state if skipped). Skip ADR unless critical
+- Produce a short design note.
+- Explicitly state: *"Impact on existing functionality: [None / Description]"*
 
 **Design Specification (Output Required):**
 * **Scope:** Files to create, modify, or delete.
@@ -91,8 +107,15 @@ Do not proceed to the next gate until you receive user confirmation.
 **Goal:** Capture intent before implementation.
 
 **Actions (Mode-Aware):**
-* **FULL MODE:** Draft README updates, API contracts, and ADRs (if triggered).
-* **LIGHT MODE:** State if docs are needed. If not, state: *"No documentation updates required."*
+
+**FULL MODE**
+- Draft README updates.
+- Define API/interface contracts.
+- Draft ADRs if triggered.
+
+**LIGHT MODE**
+- State whether documentation changes are required.
+- If none, explicitly state: *"No documentation updates required."*
 
 **STOP:** Ask *"Is this documentation accurate?"*
 
@@ -109,14 +132,16 @@ Do not proceed to the next gate until you receive user confirmation.
 **Actions:**
 1.  **Scaffold:** Create necessary directories/packages.
 2.  **Test-First Strategy:** Write **unit tests or test plan first**.
+    - Verify NEW functionality.
+    - Verify NO REGRESSION on existing functionality.
 3.  **Implementation:** Write production code.
-    * No placeholders (`TODO`, `NotImplemented`).
-    * Handle edge cases.
-    * Follow existing naming conventions.
+    - No placeholders (`TODO`, `NotImplemented`).
+    - Handle edge cases.
+    - Follow existing naming conventions.
 
 **Output Order (Mandatory):**
 1.  Tests
-2.  Implementation Code
+2.  Implementation
 
 *Immediately transition to Gate 4.*
 
@@ -139,7 +164,8 @@ Do not proceed to the next gate until you receive user confirmation.
 
 **Output:**
 1.  **Security Audit Report** (Verdict: PASS / FAIL).
-    * If **FAIL**: Fix and re-run Gate 4.
+    - If **FAIL**: Fix and re-run Gate 4.
+    - If **PASS**: State *"Ready for PR"* and list verification steps.
 2.  **Handoff Prompt** (Copy/Paste Block):
     > "I have completed the implementation. Please invoke `@security_analyst` to perform the final Deep Audit on these files: [list files]."
 
