@@ -78,3 +78,27 @@
 .deleteButton:active {
   transform: scale(0.95);
 }
+
+/* Compact mode styles */
+.taskItem.compact {
+  padding: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.taskItem.compact .content {
+  gap: 0.5rem;
+}
+
+.taskItem.compact .badge {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.65rem;
+}
+
+.taskItem.compact .description {
+  font-size: 0.875rem;
+}
+
+.taskItem.compact .deleteButton {
+  font-size: 1rem;
+  padding: 0.25rem;
+}

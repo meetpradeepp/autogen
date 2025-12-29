@@ -1,5 +1,6 @@
 import { Task } from './types';
 import styles from './TaskItem.module.css';
+import { useCompactMode } from '../../context/CompactModeContext';
 
 interface TaskItemProps {
   task: Task;
@@ -7,8 +8,10 @@ interface TaskItemProps {
 }
 
 export function TaskItem({ task, onDelete }: TaskItemProps) {
+  const { compactMode } = useCompactMode();
+  
   return (
-    <div className={styles.taskItem}>
+    <div className={`${styles.taskItem} ${compactMode ? styles.compact : ''}`}>
       <div className={styles.content}>
         <span className={`${styles.badge} ${styles[task.priority]}`}>
           {task.priority.toUpperCase()}
