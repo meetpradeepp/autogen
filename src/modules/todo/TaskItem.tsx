@@ -24,13 +24,10 @@ function isOverdue(dueDate: number): boolean {
 
 export function TaskItem({ task, onDelete }: TaskItemProps) {
   const overdue = task.dueDate ? isOverdue(task.dueDate) : false;
-
-  return (
-    <div className={`${styles.taskItem} ${overdue ? styles.overdue : ''}`}>
   const { compactMode } = useCompactMode();
   
   return (
-    <div className={`${styles.taskItem} ${compactMode ? styles.compact : ''}`}>
+    <div className={`${styles.taskItem} ${overdue ? styles.overdue : ''} ${compactMode ? styles.compact : ''}`}>
       <div className={styles.content}>
         <span className={`${styles.badge} ${styles[task.priority]}`}>
           {task.priority.toUpperCase()}
