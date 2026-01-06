@@ -1,5 +1,7 @@
 export type Priority = 'high' | 'medium' | 'low';
 
+export type SortOption = 'priority' | 'dateAdded' | 'alphabetical';
+
 export interface Task {
   id: string;
   description: string;
@@ -20,6 +22,7 @@ export interface TaskState {
   tasks: Task[];
   activeListId: string | null;
   error: string | null;
+  sortPreferences: Record<string, SortOption>; // Per-list sort preferences
 }
 
 export type TaskAction =
@@ -31,4 +34,5 @@ export type TaskAction =
   | { type: 'CREATE_LIST'; payload: string }
   | { type: 'SWITCH_LIST'; payload: string }
   | { type: 'DELETE_LIST'; payload: string }
-  | { type: 'LOAD_STATE'; payload: TaskState };
+  | { type: 'LOAD_STATE'; payload: TaskState }
+  | { type: 'SET_SORT_PREFERENCE'; payload: { listId: string; sortOption: SortOption } };

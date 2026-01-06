@@ -1,17 +1,51 @@
-import { useState } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { useToast } from '../../context/ToastContext';
 import { TaskItem } from './TaskItem';
+import { Task, SortOption } from './types';
 import styles from './TaskList.module.css';
+
+/**
+ * Sort tasks based on selected option with stable fallback to Date Added
+ */
+function sortTasks(tasks: Task[], sortOption: SortOption): Task[] {
+  return [...tasks].sort((a, b) => {
+    // Primary sort based on option
+    if (sortOption === 'priority') {
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      const aPriority = a.priority || 'low'; // Treat missing priority as low
+      const bPriority = b.priority || 'low';
+      const priorityDiff = priorityOrder[aPriority] - priorityOrder[bPriority];
+      if (priorityDiff !== 0) return priorityDiff;
+    } else if (sortOption === 'alphabetical') {
+      const comparison = a.description.toLowerCase().localeCompare(b.description.toLowerCase());
+      if (comparison !== 0) return comparison;
+    }
+    // Secondary sort: Always fallback to Date Added (newest first) for stable sort
+    return b.createdAt - a.createdAt;
+  });
+}
 
 export function TaskList() {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
-  const [sortByDueDate, setSortByDueDate] = useState(false);
+
+  // Get current sort preference for active list (default: dateAdded)
+  const currentSort: SortOption = state.activeListId 
+    ? (state.sortPreferences[state.activeListId] || 'dateAdded')
+    : 'dateAdded';
 
   const handleDelete = (id: string) => {
     dispatch({ type: 'DELETE_TASK', payload: id });
     showToast('Task deleted');
+  };
+
+  const handleSortChange = (sortOption: SortOption) => {
+    if (state.activeListId) {
+      dispatch({
+        type: 'SET_SORT_PREFERENCE',
+        payload: { listId: state.activeListId, sortOption },
+      });
+    }
   };
 
   // Filter tasks for the active list only
@@ -19,20 +53,8 @@ export function TaskList() {
     ? state.tasks.filter(task => task.listId === state.activeListId)
     : [];
 
-  // Sort tasks based on toggle
-  const sortedTasks = [...activeTasks].sort((a, b) => {
-    if (sortByDueDate) {
-      // Sort by due date: tasks with due dates first, then by date ascending
-      // Tasks without due dates go to the end
-      if (!a.dueDate && !b.dueDate) return b.createdAt - a.createdAt;
-      if (!a.dueDate) return 1;
-      if (!b.dueDate) return -1;
-      return a.dueDate - b.dueDate;
-    } else {
-      // Default: sort by creation time (newest first)
-      return b.createdAt - a.createdAt;
-    }
-  });
+  // Sort tasks based on current preference
+  const sortedTasks = sortTasks(activeTasks, currentSort);
 
   if (!state.activeListId) {
     return (
@@ -50,17 +72,29 @@ export function TaskList() {
     );
   }
 
+  // Show sort control only if there are 2+ tasks
+  const showSortControl = activeTasks.length > 1;
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <button
-          onClick={() => setSortByDueDate(!sortByDueDate)}
-          className={styles.sortButton}
-          aria-label={sortByDueDate ? 'Sort by creation time' : 'Sort by due date'}
-        >
-          {sortByDueDate ? '📅 Sorted by Due Date' : '🕒 Sorted by Creation Time'}
-        </button>
-      </div>
+      {showSortControl && (
+        <div className={styles.header}>
+          <label htmlFor="sort-select" className={styles.sortLabel}>
+            Sort by:
+          </label>
+          <select
+            id="sort-select"
+            value={currentSort}
+            onChange={(e) => handleSortChange(e.target.value as SortOption)}
+            className={styles.sortSelect}
+            aria-label="Sort tasks"
+          >
+            <option value="dateAdded">Date Added (Newest → Oldest)</option>
+            <option value="priority">Priority (High → Low)</option>
+            <option value="alphabetical">Alphabetical (A → Z)</option>
+          </select>
+        </div>
+      )}
       <div className={styles.taskList}>
         {sortedTasks.map((task) => (
           <TaskItem key={task.id} task={task} onDelete={handleDelete} />

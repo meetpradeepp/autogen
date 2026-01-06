@@ -5,10 +5,18 @@
 .header {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   margin-bottom: 1rem;
+  gap: 0.5rem;
 }
 
-.sortButton {
+.sortLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.sortSelect {
   padding: 0.5rem 1rem;
   background: #f7fafc;
   border: 1px solid #e2e8f0;
@@ -17,15 +25,18 @@
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 500;
+  color: #2d3748;
 }
 
-.sortButton:hover {
+.sortSelect:hover {
   background: #edf2f7;
   border-color: #cbd5e0;
 }
 
-.sortButton:active {
-  transform: translateY(1px);
+.sortSelect:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
 }
 
 .taskList {
