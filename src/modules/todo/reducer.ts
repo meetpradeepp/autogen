@@ -34,8 +34,8 @@ function validateTaskDescription(description: string): string {
  */
 function saveState(state: TaskState): void {
   try {
-    const { lists, tasks, activeListId } = state;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lists, tasks, activeListId }));
+    const { lists, tasks, activeListId, sortPreferences } = state;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lists, tasks, activeListId, sortPreferences }));
   } catch (error) {
     // localStorage might be full, disabled, or in private mode
     console.warn('Failed to save state to localStorage:', error);
@@ -57,6 +57,7 @@ export function loadState(): TaskState {
         tasks: parsed.tasks || [],
         activeListId: parsed.activeListId || null,
         error: null,
+        sortPreferences: parsed.sortPreferences || {},
       };
     }
 
@@ -88,6 +89,7 @@ export function loadState(): TaskState {
         tasks: migratedTasks,
         activeListId: defaultList.id,
         error: null,
+        sortPreferences: {},
       };
 
       // Save migrated state and remove legacy key
@@ -105,6 +107,7 @@ export function loadState(): TaskState {
     tasks: [],
     activeListId: null,
     error: null,
+    sortPreferences: {},
   };
 }
 
@@ -262,6 +265,19 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return action.payload;
     }
 
+    case 'SET_SORT_PREFERENCE': {
+      const { listId, sortOption } = action.payload;
+      const newState = {
+        ...state,
+        sortPreferences: {
+          ...state.sortPreferences,
+          [listId]: sortOption,
+        },
+      };
+      saveState(newState);
+      return newState;
+    }
+
     default:
       return state;
   }
@@ -272,4 +288,5 @@ export const initialState: TaskState = {
   tasks: [],
   activeListId: null,
   error: null,
+  sortPreferences: {},
 };
