@@ -16,6 +16,18 @@ const DEFAULT_COLORS = [
 ];
 
 /**
+ * Validate hex color format
+ * @throws Error if invalid
+ */
+function validateColor(color: string): string {
+  const hexPattern = /^#[0-9A-Fa-f]{6}$/;
+  if (!hexPattern.test(color)) {
+    throw new Error('Invalid color format. Must be hex (#RRGGBB)');
+  }
+  return color;
+}
+
+/**
  * Generate unique ID using crypto.randomUUID with fallback
  */
 function generateId(): string {
@@ -212,6 +224,17 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           };
         }
 
+        // Validate list name length
+        if (listName.trim().length > 100) {
+          return {
+            ...state,
+            error: 'List name too long (max 100 characters)',
+          };
+        }
+
+        // Validate color format (security: prevent CSS injection)
+        const validatedColor = validateColor(color);
+
         // Check for duplicate names
         const isDuplicate = state.lists.some(
           list => list.name.toLowerCase() === listName.trim().toLowerCase()
@@ -226,7 +249,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         const newList: TodoList = {
           id: generateId(),
           name: listName.trim(),
-          color: color,
+          color: validatedColor,
           createdAt: Date.now(),
         };
 
@@ -247,16 +270,27 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
     }
 
     case 'UPDATE_LIST_COLOR': {
-      const { listId, color } = action.payload;
-      const updatedLists = state.lists.map(list =>
-        list.id === listId ? { ...list, color } : list
-      );
-      const newState = {
-        ...state,
-        lists: updatedLists,
-      };
-      saveState(newState);
-      return newState;
+      try {
+        const { listId, color } = action.payload;
+        
+        // Validate color format (security: prevent CSS injection)
+        const validatedColor = validateColor(color);
+        
+        const updatedLists = state.lists.map(list =>
+          list.id === listId ? { ...list, color: validatedColor } : list
+        );
+        const newState = {
+          ...state,
+          lists: updatedLists,
+        };
+        saveState(newState);
+        return newState;
+      } catch (error) {
+        return {
+          ...state,
+          error: error instanceof Error ? error.message : 'Failed to update list color',
+        };
+      }
     }
 
     case 'SWITCH_LIST': {
