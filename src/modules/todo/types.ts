@@ -14,13 +14,17 @@ export interface Task {
 export interface TodoList {
   id: string;
   name: string;
+  color: string; // Hex color code for visual identification
   createdAt: number;
 }
+
+export type ViewMode = 'list' | 'calendar';
 
 export interface TaskState {
   lists: TodoList[];
   tasks: Task[];
   activeListId: string | null;
+  activeView: ViewMode;
   error: string | null;
   sortPreferences: Record<string, SortOption>; // Per-list sort preferences
 }
@@ -31,7 +35,8 @@ export type TaskAction =
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'CLEAR_ERROR' }
   | { type: 'LOAD_TASKS'; payload: Task[] }
-  | { type: 'CREATE_LIST'; payload: string }
+  | { type: 'CREATE_LIST'; payload: { name: string; color: string } }
+  | { type: 'UPDATE_LIST_COLOR'; payload: { listId: string; color: string } }
   | { type: 'SWITCH_LIST'; payload: string }
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'LOAD_STATE'; payload: TaskState }

@@ -1,0 +1,299 @@
+import { useState, useMemo } from 'react';
+import { useTaskContext } from '../../context/TaskContext';
+import { Task } from './types';
+import styles from './CalendarView.module.css';
+
+interface CalendarDay {
+  date: Date;
+  isCurrentMonth: boolean;
+  tasks: Task[];
+}
+
+function getPriorityIcon(priority: 'high' | 'medium' | 'low'): string {
+  switch (priority) {
+    case 'high':
+      return '🔥';
+    case 'medium':
+      return '⚠️';
+    case 'low':
+      return '🟢';
+  }
+}
+
+export function CalendarView() {
+  const { state } = useTaskContext();
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [showPopover, setShowPopover] = useState<{ date: string; tasks: Task[] } | null>(null);
+
+  // Generate calendar grid for current month
+  const calendarDays = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Get first day of month and last day of month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Get day of week for first day (0 = Sunday)
+    const startingDayOfWeek = firstDay.getDay();
+    
+    // Get days from previous month to fill the grid
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    const prevMonthDays = startingDayOfWeek;
+    
+    // Calculate total days to show (6 weeks max)
+    const daysInMonth = lastDay.getDate();
+    const totalDays = Math.ceil((startingDayOfWeek + daysInMonth) / 7) * 7;
+    
+    const days: CalendarDay[] = [];
+    
+    // Add previous month days
+    for (let i = prevMonthDays - 1; i >= 0; i--) {
+      const date = new Date(year, month - 1, daysInPrevMonth - i);
+      days.push({
+        date,
+        isCurrentMonth: false,
+        tasks: getTasksForDate(date),
+      });
+    }
+    
+    // Add current month days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(year, month, i);
+      days.push({
+        date,
+        isCurrentMonth: true,
+        tasks: getTasksForDate(date),
+      });
+    }
+    
+    // Add next month days
+    const remainingDays = totalDays - days.length;
+    for (let i = 1; i <= remainingDays; i++) {
+      const date = new Date(year, month + 1, i);
+      days.push({
+        date,
+        isCurrentMonth: false,
+        tasks: getTasksForDate(date),
+      });
+    }
+    
+    return days;
+  }, [currentDate, state.tasks]);
+
+  // Get tasks for a specific date
+  function getTasksForDate(date: Date): Task[] {
+    const dateStr = date.toDateString();
+    return state.tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const taskDate = new Date(task.dueDate);
+      return taskDate.toDateString() === dateStr;
+    });
+  }
+
+  // Navigate to previous month
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+  };
+
+  // Navigate to next month
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+  };
+
+  // Go to today
+  const handleToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  // Get list color for a task
+  const getListColor = (listId: string): string => {
+    const list = state.lists.find(l => l.id === listId);
+    return list?.color || '#CBD5E0';
+  };
+
+  // Handle clicking on an empty day
+  const handleDayClick = (date: Date, tasks: Task[]) => {
+    if (tasks.length === 0) {
+      // Pre-fill task form with this date
+      // For now, just show a message (task editing will be implemented in FE-205)
+      const dateStr = date.toLocaleDateString();
+      alert(`Add task for ${dateStr} (Feature coming in FE-205)`);
+    }
+  };
+
+  // Handle clicking on a task
+  const handleTaskClick = (task: Task, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Open edit task modal (placeholder for FE-205)
+    alert(`Edit task: ${task.description} (Feature coming in FE-205)`);
+  };
+
+  // Show popover with all tasks for a day
+  const handleShowMore = (date: Date, tasks: Task[], e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowPopover({ date: date.toDateString(), tasks });
+  };
+
+  // Close popover
+  const handleClosePopover = () => {
+    setShowPopover(null);
+  };
+
+  // Format month/year for header
+  const monthYearFormat = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  if (state.lists.length === 0) {
+    return (
+      <div className={styles.empty}>
+        <p>Create a list to start using the calendar view!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.calendarContainer}>
+      {/* Header with navigation */}
+      <div className={styles.header}>
+        <h2 className={styles.monthYear}>{monthYearFormat.format(currentDate)}</h2>
+        <div className={styles.navigation}>
+          <button onClick={handleToday} className={styles.todayButton}>
+            Today
+          </button>
+          <button onClick={handlePrevMonth} className={styles.navButton}>
+            ◀
+          </button>
+          <button onClick={handleNextMonth} className={styles.navButton}>
+            ▶
+          </button>
+        </div>
+      </div>
+
+      {/* Day of week headers */}
+      <div className={styles.weekDays}>
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <div key={day} className={styles.weekDay}>
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div className={styles.calendarGrid}>
+        {calendarDays.map((day, index) => (
+          <div
+            key={index}
+            className={`${styles.dayCell} ${
+              !day.isCurrentMonth ? styles.otherMonth : ''
+            } ${
+              day.date.toDateString() === new Date().toDateString()
+                ? styles.today
+                : ''
+            }`}
+            onClick={() => handleDayClick(day.date, day.tasks)}
+          >
+            <div className={styles.dayNumber}>{day.date.getDate()}</div>
+            <div className={styles.taskContainer}>
+              {day.tasks.slice(0, 3).map(task => (
+                <div
+                  key={task.id}
+                  className={styles.taskPill}
+                  style={{ backgroundColor: getListColor(task.listId) }}
+                  onClick={(e) => handleTaskClick(task, e)}
+                  title={task.description}
+                >
+                  <span className={styles.priorityIcon}>
+                    {getPriorityIcon(task.priority)}
+                  </span>
+                  <span className={styles.taskText}>{task.description}</span>
+                </div>
+              ))}
+              {day.tasks.length > 3 && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={(e) => handleShowMore(day.date, day.tasks, e)}
+                >
+                  +{day.tasks.length - 3} more
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Popover for showing all tasks */}
+      {showPopover && (
+        <div className={styles.popoverOverlay} onClick={handleClosePopover}>
+          <div className={styles.popover} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.popoverHeader}>
+              <h3>
+                {new Date(showPopover.date).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </h3>
+              <button onClick={handleClosePopover} className={styles.closeButton}>
+                ✕
+              </button>
+            </div>
+            <div className={styles.popoverContent}>
+              {showPopover.tasks.map(task => (
+                <div
+                  key={task.id}
+                  className={styles.popoverTask}
+                  style={{ borderLeftColor: getListColor(task.listId) }}
+                  onClick={(e) => handleTaskClick(task, e)}
+                >
+                  <span className={styles.priorityIcon}>
+                    {getPriorityIcon(task.priority)}
+                  </span>
+                  <span className={styles.taskText}>{task.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile agenda view */}
+      <div className={styles.agendaView}>
+        <h3 className={styles.agendaTitle}>Upcoming Tasks</h3>
+        {calendarDays
+          .filter(day => day.isCurrentMonth && day.tasks.length > 0)
+          .map((day, index) => (
+            <div key={index} className={styles.agendaDay}>
+              <div className={styles.agendaDate}>
+                {day.date.toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </div>
+              <div className={styles.agendaTasks}>
+                {day.tasks.map(task => (
+                  <div
+                    key={task.id}
+                    className={styles.agendaTask}
+                    style={{ borderLeftColor: getListColor(task.listId) }}
+                    onClick={(e) => handleTaskClick(task, e)}
+                  >
+                    <span className={styles.priorityIcon}>
+                      {getPriorityIcon(task.priority)}
+                    </span>
+                    <span className={styles.taskText}>{task.description}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        {calendarDays.filter(day => day.isCurrentMonth && day.tasks.length > 0).length === 0 && (
+          <p className={styles.agendaEmpty}>No scheduled tasks this month</p>
+        )}
+      </div>
+    </div>
+  );
+}

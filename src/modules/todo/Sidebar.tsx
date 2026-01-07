@@ -1,12 +1,14 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { useToast } from '../../context/ToastContext';
+import { DEFAULT_COLORS } from './reducer';
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
   const [newListName, setNewListName] = useState('');
+  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLORS[0]);
   const [isCreating, setIsCreating] = useState(false);
   const previousListCountRef = useRef(state.lists.length);
 
@@ -16,6 +18,7 @@ export function Sidebar() {
       const newList = state.lists[state.lists.length - 1];
       showToast(`List '${newList.name}' created`);
       setNewListName('');
+      setSelectedColor(DEFAULT_COLORS[0]);
       setIsCreating(false);
     }
     previousListCountRef.current = state.lists.length;
@@ -24,7 +27,7 @@ export function Sidebar() {
   const handleCreateList = (e: FormEvent) => {
     e.preventDefault();
     if (newListName.trim()) {
-      dispatch({ type: 'CREATE_LIST', payload: newListName });
+      dispatch({ type: 'CREATE_LIST', payload: { name: newListName, color: selectedColor } });
     }
   };
 
@@ -49,95 +52,154 @@ export function Sidebar() {
 
   const handleCancelCreate = () => {
     setNewListName('');
+    setSelectedColor(DEFAULT_COLORS[0]);
     setIsCreating(false);
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
+  const handleViewChange = (view: 'list' | 'calendar') => {
+    dispatch({ type: 'SET_VIEW', payload: view });
+  };
+
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>My Lists</h2>
+      {/* Calendars Section */}
+      <div className={styles.section}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Calendars</h2>
+        </div>
+        <nav className={styles.viewNav}>
+          <button
+            onClick={() => handleViewChange('calendar')}
+            className={`${styles.viewButton} ${state.activeView === 'calendar' ? styles.active : ''}`}
+            disabled={state.lists.length === 0}
+          >
+            📅 My Calendar
+          </button>
+        </nav>
       </div>
 
-      <nav className={styles.listNav}>
-        {state.lists.map((list) => (
-          <div
-            key={list.id}
-            className={`${styles.listItem} ${
-              state.activeListId === list.id ? styles.active : ''
-            }`}
-          >
-            <button
-              onClick={() => handleSwitchList(list.id)}
-              className={styles.listButton}
-            >
-              {list.name}
-            </button>
-            <button
-              onClick={(e) => handleDeleteList(list.id, list.name, e)}
-              className={styles.deleteButton}
-              aria-label={`Delete ${list.name}`}
-              title="Delete list"
-            >
-              <svg 
-                width="14" 
-                height="14" 
-                viewBox="0 0 16 16" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path 
-                  d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
-          </div>
-        ))}
-      </nav>
+      {/* Task Lists Section */}
+      <div className={styles.section}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Task Lists</h2>
+        </div>
 
-      {isCreating ? (
-        <form onSubmit={handleCreateList} className={styles.createForm}>
-          <input
-            type="text"
-            value={newListName}
-            onChange={(e) => {
-              setNewListName(e.target.value);
-              if (state.error) {
-                dispatch({ type: 'CLEAR_ERROR' });
-              }
-            }}
-            placeholder="List name..."
-            className={styles.input}
-            autoFocus
-            aria-label="New list name"
-          />
-          <div className={styles.formActions}>
-            <button type="submit" className={styles.saveButton}>
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleCancelCreate}
-              className={styles.cancelButton}
+        <nav className={styles.listNav}>
+          <button
+            onClick={() => handleViewChange('list')}
+            className={`${styles.viewButton} ${state.activeView === 'list' ? styles.active : ''}`}
+          >
+            📋 Tasks
+          </button>
+          
+          {state.lists.map((list) => (
+            <div
+              key={list.id}
+              className={`${styles.listItem} ${
+                state.activeListId === list.id ? styles.active : ''
+              }`}
             >
-              Cancel
-            </button>
-          </div>
-          {state.error && (
-            <div className={styles.error} role="alert">
-              {state.error}
+              <button
+                onClick={() => handleSwitchList(list.id)}
+                className={styles.listButton}
+              >
+                <span 
+                  className={styles.colorDot} 
+                  style={{ backgroundColor: list.color }}
+                  aria-hidden="true"
+                />
+                {list.name}
+              </button>
+              <button
+                onClick={(e) => handleDeleteList(list.id, list.name, e)}
+                className={styles.deleteButton}
+                aria-label={`Delete ${list.name}`}
+                title="Delete list"
+              >
+                <svg 
+                  width="14" 
+                  height="14" 
+                  viewBox="0 0 16 16" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
             </div>
-          )}
-        </form>
-      ) : (
-        <button
-          onClick={() => setIsCreating(true)}
-          className={styles.newListButton}
-        >
-          + New List
-        </button>
-      )}
+          ))}
+        </nav>
+
+        {isCreating ? (
+          <form onSubmit={handleCreateList} className={styles.createForm}>
+            <input
+              type="text"
+              value={newListName}
+              onChange={(e) => {
+                setNewListName(e.target.value);
+                if (state.error) {
+                  dispatch({ type: 'CLEAR_ERROR' });
+                }
+              }}
+              placeholder="List name..."
+              className={styles.input}
+              autoFocus
+              aria-label="New list name"
+            />
+            
+            <div className={styles.colorPicker}>
+              <label className={styles.colorLabel}>Color:</label>
+              <div className={styles.colorOptions}>
+                {DEFAULT_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setSelectedColor(color)}
+                    className={`${styles.colorOption} ${selectedColor === color ? styles.selected : ''}`}
+                    style={{ backgroundColor: color }}
+                    aria-label={`Select color ${color}`}
+                    title={color}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            <div className={styles.calendarInfo}>
+              <span className={styles.infoIcon}>ℹ️</span>
+              <span className={styles.infoText}>Tasks in this list will appear in My Calendar</span>
+            </div>
+            
+            <div className={styles.formActions}>
+              <button type="submit" className={styles.saveButton}>
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelCreate}
+                className={styles.cancelButton}
+              >
+                Cancel
+              </button>
+            </div>
+            {state.error && (
+              <div className={styles.error} role="alert">
+                {state.error}
+              </div>
+            )}
+          </form>
+        ) : (
+          <button
+            onClick={() => setIsCreating(true)}
+            className={styles.newListButton}
+          >
+            + New List
+          </button>
+        )}
+      </div>
     </aside>
   );
 }

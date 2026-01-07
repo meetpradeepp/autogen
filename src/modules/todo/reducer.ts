@@ -4,6 +4,30 @@ const STORAGE_KEY = 'taskManagerState';
 const LEGACY_STORAGE_KEY = 'tasks';
 
 /**
+ * Default color palette for lists
+ */
+const DEFAULT_COLORS = [
+  '#3B82F6', // Blue
+  '#10B981', // Green
+  '#F59E0B', // Amber
+  '#EF4444', // Red
+  '#8B5CF6', // Violet
+  '#EC4899', // Pink
+];
+
+/**
+ * Validate hex color format
+ * @throws Error if invalid
+ */
+function validateColor(color: string): string {
+  const hexPattern = /^#[0-9A-Fa-f]{6}$/;
+  if (!hexPattern.test(color)) {
+    throw new Error('Invalid color format. Must be hex (#RRGGBB)');
+  }
+  return color;
+}
+
+/**
  * Generate unique ID using crypto.randomUUID with fallback
  */
 function generateId(): string {
@@ -52,10 +76,18 @@ export function loadState(): TaskState {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
+      
+      // Migrate lists without color field
+      const migratedLists = (parsed.lists || []).map((list: TodoList, index: number) => ({
+        ...list,
+        color: list.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length],
+      }));
+      
       return {
-        lists: parsed.lists || [],
+        lists: migratedLists,
         tasks: parsed.tasks || [],
         activeListId: parsed.activeListId || null,
+        activeView: parsed.activeView || 'list',
         error: null,
         sortPreferences: parsed.sortPreferences || {},
       };
@@ -71,10 +103,11 @@ export function loadState(): TaskState {
         createdAt: number;
       }>;
       
-      // Create default "General" list
+      // Create default "General" list with color
       const defaultList: TodoList = {
         id: generateId(),
         name: 'General',
+        color: DEFAULT_COLORS[0],
         createdAt: Date.now(),
       };
 
@@ -88,6 +121,7 @@ export function loadState(): TaskState {
         lists: [defaultList],
         tasks: migratedTasks,
         activeListId: defaultList.id,
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -106,6 +140,7 @@ export function loadState(): TaskState {
     lists: [],
     tasks: [],
     activeListId: null,
+    activeView: 'list',
     error: null,
     sortPreferences: {},
   };
@@ -182,19 +217,30 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
 
     case 'CREATE_LIST': {
       try {
-        const listName = action.payload.trim();
+        const { name: listName, color } = action.payload;
         
         // Validate list name
-        if (listName.length === 0) {
+        if (listName.trim().length === 0) {
           return {
             ...state,
             error: 'List name cannot be empty',
           };
         }
 
+        // Validate list name length
+        if (listName.trim().length > 100) {
+          return {
+            ...state,
+            error: 'List name too long (max 100 characters)',
+          };
+        }
+
+        // Validate color format (security: prevent CSS injection)
+        const validatedColor = validateColor(color);
+
         // Check for duplicate names
         const isDuplicate = state.lists.some(
-          list => list.name.toLowerCase() === listName.toLowerCase()
+          list => list.name.toLowerCase() === listName.trim().toLowerCase()
         );
         if (isDuplicate) {
           return {
@@ -205,7 +251,8 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
 
         const newList: TodoList = {
           id: generateId(),
-          name: listName,
+          name: listName.trim(),
+          color: validatedColor,
           createdAt: Date.now(),
         };
 
@@ -221,6 +268,30 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         return {
           ...state,
           error: error instanceof Error ? error.message : 'Failed to create list',
+        };
+      }
+    }
+
+    case 'UPDATE_LIST_COLOR': {
+      try {
+        const { listId, color } = action.payload;
+        
+        // Validate color format (security: prevent CSS injection)
+        const validatedColor = validateColor(color);
+        
+        const updatedLists = state.lists.map(list =>
+          list.id === listId ? { ...list, color: validatedColor } : list
+        );
+        const newState = {
+          ...state,
+          lists: updatedLists,
+        };
+        saveState(newState);
+        return newState;
+      } catch (error) {
+        return {
+          ...state,
+          error: error instanceof Error ? error.message : 'Failed to update list color',
         };
       }
     }
@@ -287,6 +358,9 @@ export const initialState: TaskState = {
   lists: [],
   tasks: [],
   activeListId: null,
+  activeView: 'list',
   error: null,
   sortPreferences: {},
 };
+
+export { DEFAULT_COLORS };

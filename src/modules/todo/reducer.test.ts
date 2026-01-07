@@ -13,12 +13,14 @@ describe('taskReducer', () => {
     const list: TodoList = {
       id: 'test-list-id',
       name: listName,
+      color: '#3B82F6',
       createdAt: Date.now(),
     };
     return {
       lists: [list],
       tasks: [],
       activeListId: list.id,
+      activeView: 'list',
       error: null,
       sortPreferences: {},
     };
@@ -122,6 +124,7 @@ describe('taskReducer', () => {
         lists: [],
         tasks: [],
         activeListId: null,
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -247,15 +250,17 @@ describe('taskReducer', () => {
         lists: [],
         tasks: [],
         activeListId: null,
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
-      const action = { type: 'CREATE_LIST' as const, payload: 'Work Tasks' };
+      const action = { type: 'CREATE_LIST' as const, payload: { name: 'Work Tasks', color: '#3B82F6' } };
 
       const newState = taskReducer(state, action);
 
       expect(newState.lists).toHaveLength(1);
       expect(newState.lists[0].name).toBe('Work Tasks');
+      expect(newState.lists[0].color).toBe('#3B82F6');
       expect(newState.lists[0].id).toBeDefined();
       expect(newState.activeListId).toBe(newState.lists[0].id);
       expect(newState.error).toBeNull();
@@ -263,7 +268,7 @@ describe('taskReducer', () => {
 
     it('should reject duplicate list names (case-insensitive)', () => {
       const state = createStateWithList('Work');
-      const action = { type: 'CREATE_LIST' as const, payload: 'work' };
+      const action = { type: 'CREATE_LIST' as const, payload: { name: 'work', color: '#10B981' } };
 
       const newState = taskReducer(state, action);
 
@@ -276,10 +281,11 @@ describe('taskReducer', () => {
         lists: [],
         tasks: [],
         activeListId: null,
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
-      const action = { type: 'CREATE_LIST' as const, payload: '   ' };
+      const action = { type: 'CREATE_LIST' as const, payload: { name: '   ', color: '#F59E0B' } };
 
       const newState = taskReducer(state, action);
 
@@ -294,6 +300,7 @@ describe('taskReducer', () => {
       const secondList: TodoList = {
         id: 'second-list-id',
         name: 'Second List',
+        color: '#10B981',
         createdAt: Date.now(),
       };
       state.lists.push(secondList);
@@ -310,11 +317,13 @@ describe('taskReducer', () => {
       const list1: TodoList = {
         id: 'list-1',
         name: 'List 1',
+        color: '#3B82F6',
         createdAt: Date.now(),
       };
       const list2: TodoList = {
         id: 'list-2',
         name: 'List 2',
+        color: '#10B981',
         createdAt: Date.now(),
       };
       const state: TaskState = {
@@ -325,6 +334,7 @@ describe('taskReducer', () => {
           { id: 't3', description: 'Task 3', priority: 'low' as const, createdAt: Date.now(), listId: 'list-1' },
         ],
         activeListId: 'list-2',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -355,17 +365,20 @@ describe('taskReducer', () => {
       const list1: TodoList = {
         id: 'list-1',
         name: 'List 1',
+        color: '#3B82F6',
         createdAt: Date.now(),
       };
       const list2: TodoList = {
         id: 'list-2',
         name: 'List 2',
+        color: '#10B981',
         createdAt: Date.now(),
       };
       const state: TaskState = {
         lists: [list1, list2],
         tasks: [],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -381,17 +394,20 @@ describe('taskReducer', () => {
       const list1: TodoList = {
         id: 'list-1',
         name: 'List 1',
+        color: '#3B82F6',
         createdAt: Date.now(),
       };
       const list2: TodoList = {
         id: 'list-2',
         name: 'List 2',
+        color: '#10B981',
         createdAt: Date.now(),
       };
       const state: TaskState = {
         lists: [list1, list2],
         tasks: [],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -407,11 +423,13 @@ describe('taskReducer', () => {
       const list1: TodoList = {
         id: 'list-1',
         name: 'List 1',
+        color: '#3B82F6',
         createdAt: Date.now(),
       };
       const list2: TodoList = {
         id: 'list-2',
         name: 'List 2',
+        color: '#10B981',
         createdAt: Date.now(),
       };
       const state: TaskState = {
@@ -420,6 +438,7 @@ describe('taskReducer', () => {
           { id: 't1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
