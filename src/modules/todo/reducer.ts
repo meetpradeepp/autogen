@@ -58,8 +58,8 @@ function validateTaskDescription(description: string): string {
  */
 function saveState(state: TaskState): void {
   try {
-    const { lists, tasks, activeListId, activeView } = state;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lists, tasks, activeListId, activeView }));
+    const { lists, tasks, activeListId, sortPreferences } = state;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lists, tasks, activeListId, sortPreferences }));
   } catch (error) {
     // localStorage might be full, disabled, or in private mode
     console.warn('Failed to save state to localStorage:', error);
@@ -89,6 +89,7 @@ export function loadState(): TaskState {
         activeListId: parsed.activeListId || null,
         activeView: parsed.activeView || 'list',
         error: null,
+        sortPreferences: parsed.sortPreferences || {},
       };
     }
 
@@ -122,6 +123,7 @@ export function loadState(): TaskState {
         activeListId: defaultList.id,
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
 
       // Save migrated state and remove legacy key
@@ -140,6 +142,7 @@ export function loadState(): TaskState {
     activeListId: null,
     activeView: 'list',
     error: null,
+    sortPreferences: {},
   };
 }
 
@@ -333,10 +336,14 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return action.payload;
     }
 
-    case 'SET_VIEW': {
+    case 'SET_SORT_PREFERENCE': {
+      const { listId, sortOption } = action.payload;
       const newState = {
         ...state,
-        activeView: action.payload,
+        sortPreferences: {
+          ...state.sortPreferences,
+          [listId]: sortOption,
+        },
       };
       saveState(newState);
       return newState;
@@ -353,6 +360,7 @@ export const initialState: TaskState = {
   activeListId: null,
   activeView: 'list',
   error: null,
+  sortPreferences: {},
 };
 
 export { DEFAULT_COLORS };

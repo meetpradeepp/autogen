@@ -22,6 +22,7 @@ describe('taskReducer', () => {
       activeListId: list.id,
       activeView: 'list',
       error: null,
+      sortPreferences: {},
     };
   };
 
@@ -125,6 +126,7 @@ describe('taskReducer', () => {
         activeListId: null,
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
       const action = {
         type: 'ADD_TASK' as const,
@@ -250,6 +252,7 @@ describe('taskReducer', () => {
         activeListId: null,
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
       const action = { type: 'CREATE_LIST' as const, payload: { name: 'Work Tasks', color: '#3B82F6' } };
 
@@ -280,6 +283,7 @@ describe('taskReducer', () => {
         activeListId: null,
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
       const action = { type: 'CREATE_LIST' as const, payload: { name: '   ', color: '#F59E0B' } };
 
@@ -332,6 +336,7 @@ describe('taskReducer', () => {
         activeListId: 'list-2',
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
 
       const action = { type: 'DELETE_LIST' as const, payload: 'list-1' };
@@ -375,6 +380,7 @@ describe('taskReducer', () => {
         activeListId: 'list-1',
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
 
       const action = { type: 'DELETE_LIST' as const, payload: 'list-1' };
@@ -403,6 +409,7 @@ describe('taskReducer', () => {
         activeListId: 'list-1',
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
 
       const action = { type: 'DELETE_LIST' as const, payload: 'list-2' };
@@ -433,6 +440,7 @@ describe('taskReducer', () => {
         activeListId: 'list-1',
         activeView: 'list',
         error: null,
+        sortPreferences: {},
       };
 
       const action = { type: 'DELETE_LIST' as const, payload: 'list-1' };
@@ -449,7 +457,7 @@ describe('taskReducer', () => {
 
   describe('SET_ERROR action', () => {
     it('should set error message', () => {
-      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'list', error: null };
+      const state: TaskState = { lists: [], tasks: [], activeListId: null, error: null, sortPreferences: {} };
       const action = { type: 'SET_ERROR' as const, payload: 'Test error' };
 
       const newState = taskReducer(state, action);
@@ -460,7 +468,7 @@ describe('taskReducer', () => {
 
   describe('CLEAR_ERROR action', () => {
     it('should clear error message', () => {
-      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'list', error: 'Existing error' };
+      const state: TaskState = { lists: [], tasks: [], activeListId: null, error: 'Existing error', sortPreferences: {} };
       const action = { type: 'CLEAR_ERROR' as const };
 
       const newState = taskReducer(state, action);

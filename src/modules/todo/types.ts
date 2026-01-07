@@ -1,5 +1,7 @@
 export type Priority = 'high' | 'medium' | 'low';
 
+export type SortOption = 'priority' | 'dateAdded' | 'alphabetical';
+
 export interface Task {
   id: string;
   description: string;
@@ -24,6 +26,7 @@ export interface TaskState {
   activeListId: string | null;
   activeView: ViewMode;
   error: string | null;
+  sortPreferences: Record<string, SortOption>; // Per-list sort preferences
 }
 
 export type TaskAction =
@@ -36,5 +39,5 @@ export type TaskAction =
   | { type: 'UPDATE_LIST_COLOR'; payload: { listId: string; color: string } }
   | { type: 'SWITCH_LIST'; payload: string }
   | { type: 'DELETE_LIST'; payload: string }
-  | { type: 'SET_VIEW'; payload: ViewMode }
-  | { type: 'LOAD_STATE'; payload: TaskState };
+  | { type: 'LOAD_STATE'; payload: TaskState }
+  | { type: 'SET_SORT_PREFERENCE'; payload: { listId: string; sortOption: SortOption } };
