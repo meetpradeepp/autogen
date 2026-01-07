@@ -349,6 +349,13 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return newState;
     }
 
+    case 'SET_VIEW': {
+      return {
+        ...state,
+        activeView: action.payload,
+      };
+    }
+
     default:
       return state;
   }

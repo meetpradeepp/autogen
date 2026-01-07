@@ -457,7 +457,7 @@ describe('taskReducer', () => {
 
   describe('SET_ERROR action', () => {
     it('should set error message', () => {
-      const state: TaskState = { lists: [], tasks: [], activeListId: null, error: null, sortPreferences: {} };
+      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'list', error: null, sortPreferences: {} };
       const action = { type: 'SET_ERROR' as const, payload: 'Test error' };
 
       const newState = taskReducer(state, action);
@@ -468,12 +468,33 @@ describe('taskReducer', () => {
 
   describe('CLEAR_ERROR action', () => {
     it('should clear error message', () => {
-      const state: TaskState = { lists: [], tasks: [], activeListId: null, error: 'Existing error', sortPreferences: {} };
+      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'list', error: 'Existing error', sortPreferences: {} };
       const action = { type: 'CLEAR_ERROR' as const };
 
       const newState = taskReducer(state, action);
 
       expect(newState.error).toBeNull();
+    });
+  });
+
+  describe('SET_VIEW action', () => {
+    it('should set view to calendar', () => {
+      const state = createStateWithList();
+      const action = { type: 'SET_VIEW' as const, payload: 'calendar' as const };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.activeView).toBe('calendar');
+    });
+
+    it('should set view to list', () => {
+      const state = createStateWithList();
+      state.activeView = 'calendar';
+      const action = { type: 'SET_VIEW' as const, payload: 'list' as const };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.activeView).toBe('list');
     });
   });
 
