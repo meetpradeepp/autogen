@@ -74,7 +74,7 @@ export function Sidebar() {
             className={`${styles.viewButton} ${state.activeView === 'calendar' ? styles.active : ''}`}
             disabled={state.lists.length === 0}
           >
-            📅 Calendar View
+            📅 My Calendar
           </button>
         </nav>
       </div>
@@ -90,7 +90,7 @@ export function Sidebar() {
             onClick={() => handleViewChange('list')}
             className={`${styles.viewButton} ${state.activeView === 'list' ? styles.active : ''}`}
           >
-            📋 List View
+            📋 Tasks
           </button>
           
           {state.lists.map((list) => (
@@ -166,6 +166,11 @@ export function Sidebar() {
                   />
                 ))}
               </div>
+            </div>
+            
+            <div className={styles.calendarInfo}>
+              <span className={styles.infoIcon}>ℹ️</span>
+              <span className={styles.infoText}>Tasks in this list will appear in My Calendar</span>
             </div>
             
             <div className={styles.formActions}>

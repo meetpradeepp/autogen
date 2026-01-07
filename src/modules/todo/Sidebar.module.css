@@ -217,6 +217,28 @@
   box-shadow: 0 0 0 2px white, 0 0 0 4px #2d3748;
 }
 
+.calendarInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #edf2f7;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  border-left: 3px solid #4a90e2;
+}
+
+.infoIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.infoText {
+  font-size: 0.8rem;
+  color: #4a5568;
+  line-height: 1.4;
+}
+
 .formActions {
   display: flex;
   gap: 0.5rem;
