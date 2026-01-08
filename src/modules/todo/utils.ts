@@ -2,15 +2,32 @@
  * Utility functions for task management
  */
 
+// Create formatters at module level for performance
+const createdDateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+});
+
+const dueDateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+});
+
 /**
  * Format task creation date in "DD MMM" format (e.g., "12 Jan")
  */
 export function formatCreatedDate(timestamp: number): string {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-  });
-  return formatter.format(new Date(timestamp));
+  return createdDateFormatter.format(new Date(timestamp));
+}
+
+/**
+ * Format task due date in "MMM DD, HH:MM AM/PM" format (e.g., "Jan 15, 10:00 AM")
+ */
+export function formatDueDate(timestamp: number): string {
+  return dueDateFormatter.format(new Date(timestamp));
 }
 
 /**

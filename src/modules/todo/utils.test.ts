@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatCreatedDate, formatTaskAge } from './utils';
+import { formatCreatedDate, formatTaskAge, formatDueDate } from './utils';
 
 describe('formatCreatedDate', () => {
   it('should format timestamp as "DD MMM"', () => {
@@ -18,6 +18,20 @@ describe('formatCreatedDate', () => {
     const timestamp = new Date('2026-02-05').getTime();
     const result = formatCreatedDate(timestamp);
     expect(result).toBe('Feb 5');
+  });
+});
+
+describe('formatDueDate', () => {
+  it('should format timestamp with time', () => {
+    const timestamp = new Date('2026-01-15T10:00:00').getTime();
+    const result = formatDueDate(timestamp);
+    expect(result).toBe('Jan 15, 10:00 AM');
+  });
+
+  it('should format afternoon times', () => {
+    const timestamp = new Date('2026-03-20T15:30:00').getTime();
+    const result = formatDueDate(timestamp);
+    expect(result).toBe('Mar 20, 3:30 PM');
   });
 });
 
