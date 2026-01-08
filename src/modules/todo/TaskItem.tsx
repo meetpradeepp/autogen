@@ -1,22 +1,12 @@
 import { Task } from './types';
 import styles from './TaskItem.module.css';
 import { useCompactMode } from '../../context/CompactModeContext';
+import { formatCreatedDate, formatTaskAge, formatDueDate } from './utils';
 
 interface TaskItemProps {
   task: Task;
   onDelete: (id: string) => void;
   onEdit: (task: Task) => void;
-}
-
-function formatDueDate(timestamp: number): string {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-  return formatter.format(new Date(timestamp));
 }
 
 function isOverdue(dueDate: number): boolean {
@@ -40,6 +30,11 @@ export function TaskItem({ task, onDelete, onEdit }: TaskItemProps) {
         )}
         <div className={styles.textContent}>
           <p className={styles.description}>{task.description}</p>
+          {!compactMode && (
+            <p className={styles.metadata}>
+              Created: {formatCreatedDate(task.createdAt)} · Age: {formatTaskAge(task.createdAt)}
+            </p>
+          )}
           {task.dueDate && (
             <p className={styles.dueDate}>
               Due: {formatDueDate(task.dueDate)}
