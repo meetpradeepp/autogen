@@ -18,7 +18,7 @@ export function ProductivityDashboard() {
     const now = Date.now();
     const oneDayMs = 24 * 60 * 60 * 1000;
 
-    // Open Tasks: all tasks (assuming all are incomplete in this system)
+    // Open Tasks: count all tasks (system deletes completed tasks, so all existing tasks are open)
     const openTasks = state.tasks.length;
 
     // Overdue: tasks with dueDate < now
@@ -35,10 +35,8 @@ export function ProductivityDashboard() {
     // Oldest Task: age in days of the oldest task
     let oldestTaskAge: number | null = null;
     if (state.tasks.length > 0) {
-      const oldestTask = state.tasks.reduce((oldest, task) => 
-        task.createdAt < oldest.createdAt ? task : oldest
-      );
-      const ageMs = now - oldestTask.createdAt;
+      const oldestCreatedAt = Math.min(...state.tasks.map(task => task.createdAt));
+      const ageMs = now - oldestCreatedAt;
       oldestTaskAge = Math.floor(ageMs / oneDayMs);
     }
 
