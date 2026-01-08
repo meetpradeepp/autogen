@@ -56,6 +56,12 @@ export function TaskForm() {
     }
   };
 
+  // State Guard: Only render TaskForm when an active list is selected
+  // This prevents users from attempting to create tasks without context
+  if (state.activeListId === null) {
+    return null;
+  }
+
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputGroup}>
