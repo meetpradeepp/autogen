@@ -62,8 +62,19 @@ export function TaskForm() {
     return null;
   }
 
+  // Get the current active list for display
+  const activeList = state.lists.find(list => list.id === state.activeListId);
+  const activeListName = activeList?.name || 'Unknown List';
+
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.listIndicator}>
+        <span className={styles.listLabel}>Adding to:</span>
+        <span className={styles.listName} style={{ color: activeList?.color || '#4a5568' }}>
+          {activeListName}
+        </span>
+      </div>
+      
       <div className={styles.inputGroup}>
         <input
           type="text"
