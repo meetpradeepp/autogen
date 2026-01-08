@@ -33,6 +33,10 @@ export function Sidebar() {
 
   const handleSwitchList = (listId: string) => {
     dispatch({ type: 'SWITCH_LIST', payload: listId });
+    // When switching to a list, ensure we're in dashboard view
+    if (state.activeView !== 'dashboard') {
+      dispatch({ type: 'SET_VIEW', payload: 'dashboard' });
+    }
   };
 
   const handleDeleteList = (listId: string, listName: string, e: React.MouseEvent) => {
@@ -57,24 +61,30 @@ export function Sidebar() {
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
-  const handleViewChange = (view: 'list' | 'calendar') => {
+  const handleViewChange = (view: 'dashboard' | 'calendar') => {
     dispatch({ type: 'SET_VIEW', payload: view });
   };
 
   return (
     <aside className={styles.sidebar}>
-      {/* Calendars Section */}
+      {/* Views Section */}
       <div className={styles.section}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Calendars</h2>
+          <h2 className={styles.title}>Views</h2>
         </div>
         <nav className={styles.viewNav}>
+          <button
+            onClick={() => handleViewChange('dashboard')}
+            className={`${styles.viewButton} ${state.activeView === 'dashboard' ? styles.active : ''}`}
+          >
+            📊 Dashboard
+          </button>
           <button
             onClick={() => handleViewChange('calendar')}
             className={`${styles.viewButton} ${state.activeView === 'calendar' ? styles.active : ''}`}
             disabled={state.lists.length === 0}
           >
-            📅 My Calendar
+            📅 Calendar
           </button>
         </nav>
       </div>
@@ -86,52 +96,49 @@ export function Sidebar() {
         </div>
 
         <nav className={styles.listNav}>
-          <button
-            onClick={() => handleViewChange('list')}
-            className={`${styles.viewButton} ${state.activeView === 'list' ? styles.active : ''}`}
-          >
-            📋 Tasks
-          </button>
-          
-          {state.lists.map((list) => (
-            <div
-              key={list.id}
-              className={`${styles.listItem} ${
-                state.activeListId === list.id ? styles.active : ''
-              }`}
-            >
-              <button
-                onClick={() => handleSwitchList(list.id)}
-                className={styles.listButton}
+          {state.lists.length === 0 ? (
+            <div className={styles.emptyState}>No lists yet</div>
+          ) : (
+            state.lists.map((list) => (
+              <div
+                key={list.id}
+                className={`${styles.listItem} ${
+                  state.activeListId === list.id ? styles.active : ''
+                }`}
               >
-                <span 
-                  className={styles.colorDot} 
-                  style={{ backgroundColor: list.color }}
-                  aria-hidden="true"
-                />
-                {list.name}
-              </button>
-              <button
-                onClick={(e) => handleDeleteList(list.id, list.name, e)}
-                className={styles.deleteButton}
-                aria-label={`Delete ${list.name}`}
-                title="Delete list"
-              >
-                <svg 
-                  width="14" 
-                  height="14" 
-                  viewBox="0 0 16 16" 
-                  fill="none" 
-                  xmlns="http://www.w3.org/2000/svg"
+                <button
+                  onClick={() => handleSwitchList(list.id)}
+                  className={styles.listButton}
                 >
-                  <path 
-                    d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
-                    fill="currentColor"
+                  <span 
+                    className={styles.colorDot} 
+                    style={{ backgroundColor: list.color }}
+                    aria-hidden="true"
                   />
-                </svg>
-              </button>
-            </div>
-          ))}
+                  {list.name}
+                </button>
+                <button
+                  onClick={(e) => handleDeleteList(list.id, list.name, e)}
+                  className={styles.deleteButton}
+                  aria-label={`Delete ${list.name}`}
+                  title="Delete list"
+                >
+                  <svg 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 16 16" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))
+          )}
         </nav>
 
         {isCreating ? (

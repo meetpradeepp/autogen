@@ -288,6 +288,14 @@
   font-size: 0.85rem;
 }
 
+.emptyState {
+  padding: 1rem;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     min-width: 200px;

@@ -93,7 +93,7 @@ export function loadState(): TaskState {
         lists: migratedLists,
         tasks: parsed.tasks || [],
         activeListId: parsed.activeListId || null,
-        activeView: parsed.activeView || 'list',
+        activeView: parsed.activeView === 'list' ? 'dashboard' : (parsed.activeView || 'dashboard'),
         error: null,
         sortPreferences: parsed.sortPreferences || {},
       };
@@ -127,7 +127,7 @@ export function loadState(): TaskState {
         lists: [defaultList],
         tasks: migratedTasks,
         activeListId: defaultList.id,
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -146,7 +146,7 @@ export function loadState(): TaskState {
     lists: [],
     tasks: [],
     activeListId: null,
-    activeView: 'list',
+    activeView: 'dashboard',
     error: null,
     sortPreferences: {},
   };
@@ -422,7 +422,7 @@ export const initialState: TaskState = {
   lists: [],
   tasks: [],
   activeListId: null,
-  activeView: 'list',
+  activeView: 'dashboard',
   error: null,
   sortPreferences: {},
 };
