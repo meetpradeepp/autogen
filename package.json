@@ -1,7 +1,7 @@
 {
   "name": "autogen",
   "version": "1.0.0",
-  "description": "Task management application with priority levels and local persistence",
+  "description": "Enterprise-grade task management application with priority levels, multiple lists, calendar view, and local persistence",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,9 +10,22 @@
     "preview": "vite preview",
     "test": "vitest"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "task-manager",
+    "todo",
+    "productivity",
+    "react",
+    "typescript",
+    "vite",
+    "calendar",
+    "enterprise"
+  ],
+  "author": "Autogen Team",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meetpradeepp/autogen.git"
+  },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",

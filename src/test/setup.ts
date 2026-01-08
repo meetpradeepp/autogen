@@ -27,9 +27,13 @@ const localStorageMock = (() => {
 
 global.localStorage = localStorageMock as Storage;
 
-// Mock crypto.randomUUID
+// Mock crypto.randomUUID for test environment
 if (typeof global.crypto === 'undefined') {
-  (global as any).crypto = {
-    randomUUID: () => `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-  };
+  Object.defineProperty(global, 'crypto', {
+    value: {
+      randomUUID: () => `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+    },
+    writable: true,
+    configurable: true,
+  });
 }
