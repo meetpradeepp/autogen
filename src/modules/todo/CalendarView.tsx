@@ -226,16 +226,16 @@ export function CalendarView() {
                   key={task.id}
                   className={styles.taskPill}
                   style={{ backgroundColor: getListColor(task.listId) }}
-                  title={`${task.description} (Created: ${formatCreatedDate(task.createdAt)})`}
+                  title={`${task.title} (Created: ${formatCreatedDate(task.createdAt)})`}
                 >
                   <span className={styles.priorityIcon}>
                     {getPriorityIcon(task.priority)}
                   </span>
-                  <span className={styles.taskText}>{task.description}</span>
+                  <span className={styles.taskText}>{task.title}</span>
                   <button
                     className={styles.editIconButton}
                     onClick={(e) => handleTaskClick(task, e)}
-                    aria-label={`Edit task: ${task.description}`}
+                    aria-label={`Edit task: ${task.title}`}
                   >
                     ✏️
                   </button>
@@ -280,11 +280,11 @@ export function CalendarView() {
                   <span className={styles.priorityIcon}>
                     {getPriorityIcon(task.priority)}
                   </span>
-                  <span className={styles.taskText}>{task.description}</span>
+                  <span className={styles.taskText}>{task.title}</span>
                   <button
                     className={styles.popoverEditButton}
                     onClick={(e) => handleTaskClick(task, e)}
-                    aria-label={`Edit task: ${task.description}`}
+                    aria-label={`Edit task: ${task.title}`}
                   >
                     ✏️
                   </button>
@@ -319,11 +319,11 @@ export function CalendarView() {
                     <span className={styles.priorityIcon}>
                       {getPriorityIcon(task.priority)}
                     </span>
-                    <span className={styles.taskText}>{task.description}</span>
+                    <span className={styles.taskText}>{task.title}</span>
                     <button
                       className={styles.agendaEditButton}
                       onClick={(e) => handleTaskClick(task, e)}
-                      aria-label={`Edit task: ${task.description}`}
+                      aria-label={`Edit task: ${task.title}`}
                     >
                       ✏️
                     </button>

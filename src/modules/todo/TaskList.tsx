@@ -19,7 +19,7 @@ function sortTasks(tasks: Task[], sortOption: SortOption): Task[] {
       const priorityDiff = priorityOrder[aPriority] - priorityOrder[bPriority];
       if (priorityDiff !== 0) return priorityDiff;
     } else if (sortOption === 'alphabetical') {
-      const comparison = a.description.toLowerCase().localeCompare(b.description.toLowerCase());
+      const comparison = a.title.toLowerCase().localeCompare(b.title.toLowerCase());
       if (comparison !== 0) return comparison;
     }
     // Secondary sort: Always fallback to Date Added (newest first) for stable sort
@@ -44,6 +44,10 @@ export function TaskList() {
 
   const handleEdit = (task: Task) => {
     setEditingTask(task);
+  };
+
+  const handleToggleComplete = (id: string) => {
+    dispatch({ type: 'TOGGLE_TASK_COMPLETION', payload: id });
   };
 
   const handleCloseModal = () => {
@@ -113,6 +117,7 @@ export function TaskList() {
             task={task} 
             onDelete={handleDelete}
             onEdit={handleEdit}
+            onToggleComplete={handleToggleComplete}
           />
         ))}
       </div>

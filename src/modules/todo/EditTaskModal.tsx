@@ -15,8 +15,10 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
   const isEditMode = !!task;
+  const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
   const [priority, setPriority] = useState<Priority>(task?.priority || 'medium');
+  const [isCompleted, setIsCompleted] = useState(task?.isCompleted ?? false);
   const [dueDate, setDueDate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -86,9 +88,11 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
         type: 'UPDATE_TASK',
         payload: {
           id: task!.id,
-          description,
+          title,
+          description: description || undefined,
           priority,
           dueDate: dueDateTimestamp,
+          isCompleted,
           ...(listIdChanged && { listId: selectedListId }),
         },
       });
@@ -97,7 +101,8 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
       dispatch({
         type: 'ADD_TASK',
         payload: {
-          description,
+          title,
+          description: description || undefined,
           priority,
           dueDate: dueDateTimestamp,
           listId: selectedListId,
@@ -120,7 +125,7 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
       // Check if our task was actually updated (success case)
       const updatedTask = state.tasks.find(t => t.id === task!.id);
       if (updatedTask && 
-          updatedTask.description === description && 
+          updatedTask.title === title && 
           updatedTask.priority === priority &&
           updatedTask.listId === selectedListId) {
         // Task was updated successfully (including potential list change)
@@ -133,7 +138,7 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
       // In create mode, find task matching our input (newest task with matching criteria)
       // Check tasks in reverse chronological order to find the most recently created
       const matchingTask = state.tasks.find(t => 
-        t.description === description && 
+        t.title === title && 
         t.priority === priority &&
         t.listId === selectedListId
       );
@@ -145,14 +150,18 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
         onClose();
       }
     }
-  }, [state.tasks, state.error, task, description, priority, selectedListId, isSubmitting, isEditMode, onClose, showToast]);
+  }, [state.tasks, state.error, task, title, priority, selectedListId, isSubmitting, isEditMode, onClose, showToast]);
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(e.target.value);
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
     // Clear error when user starts typing
     if (state.error) {
       dispatch({ type: 'CLEAR_ERROR' });
     }
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -177,18 +186,34 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
         
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
+            <label htmlFor="task-title" className={styles.label}>
+              Title <span className={styles.required}>*</span>
+            </label>
+            <input
+              id="task-title"
+              type="text"
+              value={title}
+              onChange={handleTitleChange}
+              placeholder="Enter task title..."
+              className={styles.input}
+              aria-label="Task title"
+              required
+              autoFocus
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
             <label htmlFor="task-description" className={styles.label}>
               Description
             </label>
-            <input
+            <textarea
               id="task-description"
-              type="text"
               value={description}
               onChange={handleDescriptionChange}
-              placeholder="Enter task description..."
-              className={styles.input}
+              placeholder="Enter detailed description (optional)..."
+              className={styles.textarea}
               aria-label="Task description"
-              autoFocus
+              rows={4}
             />
           </div>
           
@@ -254,6 +279,23 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
               aria-label="Task due date"
             />
           </div>
+          
+          {isEditMode && (
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                Status
+              </label>
+              <div className={styles.statusToggle}>
+                <button
+                  type="button"
+                  onClick={() => setIsCompleted(!isCompleted)}
+                  className={`${styles.toggleButton} ${isCompleted ? styles.completed : styles.pending}`}
+                >
+                  {isCompleted ? '✓ Mark as Undone' : '○ Mark as Done'}
+                </button>
+              </div>
+            </div>
+          )}
           
           {state.error && (
             <div className={styles.error} role="alert">
