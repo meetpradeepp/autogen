@@ -15,6 +15,7 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
   const [description, setDescription] = useState(task.description);
   const [priority, setPriority] = useState<Priority>(task.priority);
   const [dueDate, setDueDate] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize due date from task
   useEffect(() => {
@@ -49,6 +50,7 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
       dueDateTimestamp = !isNaN(timestamp) ? timestamp : undefined;
     }
     
+    setIsSubmitting(true);
     dispatch({
       type: 'UPDATE_TASK',
       payload: {
@@ -58,16 +60,26 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
         dueDate: dueDateTimestamp,
       },
     });
+  };
 
-    // Check for errors after dispatch
-    if (!state.error) {
-      const truncatedDesc = description.length > 50 
-        ? description.substring(0, 50) + '...' 
-        : description;
-      showToast(`Task '${truncatedDesc}' updated`);
+  // Handle success/error after dispatch
+  useEffect(() => {
+    if (!isSubmitting) return;
+    
+    // If there's an error, don't close the modal
+    if (state.error) {
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Check if our task was actually updated (success case)
+    const updatedTask = state.tasks.find(t => t.id === task.id);
+    if (updatedTask && updatedTask.description === description && updatedTask.priority === priority) {
+      showToast('Task updated successfully');
+      setIsSubmitting(false);
       onClose();
     }
-  };
+  }, [state.tasks, state.error, task.id, description, priority, isSubmitting, onClose, showToast]);
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);

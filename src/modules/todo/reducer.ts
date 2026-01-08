@@ -202,6 +202,14 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         // Validate description
         const validatedDescription = validateTaskDescription(description);
         
+        // Validate dueDate timestamp
+        const validatedDueDate = (dueDate !== undefined && 
+                                  isFinite(dueDate) && 
+                                  dueDate > 0 && 
+                                  dueDate <= 8640000000000000) 
+          ? dueDate 
+          : undefined;
+        
         // Update the task
         const updatedTasks = state.tasks.map(task =>
           task.id === id
@@ -209,7 +217,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
                 ...task,
                 description: validatedDescription,
                 priority,
-                dueDate,
+                dueDate: validatedDueDate,
               }
             : task
         );
