@@ -20,7 +20,7 @@ describe('taskReducer', () => {
       lists: [list],
       tasks: [],
       activeListId: list.id,
-      activeView: 'list',
+      activeView: 'dashboard',
       error: null,
       sortPreferences: {},
     };
@@ -124,7 +124,7 @@ describe('taskReducer', () => {
         lists: [],
         tasks: [],
         activeListId: null,
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -339,7 +339,7 @@ describe('taskReducer', () => {
         lists: [],
         tasks: [],
         activeListId: null,
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -370,7 +370,7 @@ describe('taskReducer', () => {
         lists: [],
         tasks: [],
         activeListId: null,
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -423,7 +423,7 @@ describe('taskReducer', () => {
           { id: 't3', description: 'Task 3', priority: 'low' as const, createdAt: Date.now(), listId: 'list-1' },
         ],
         activeListId: 'list-2',
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -467,7 +467,7 @@ describe('taskReducer', () => {
         lists: [list1, list2],
         tasks: [],
         activeListId: 'list-1',
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -496,7 +496,7 @@ describe('taskReducer', () => {
         lists: [list1, list2],
         tasks: [],
         activeListId: 'list-1',
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -527,7 +527,7 @@ describe('taskReducer', () => {
           { id: 't1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
         ],
         activeListId: 'list-1',
-        activeView: 'list',
+        activeView: 'dashboard',
         error: null,
         sortPreferences: {},
       };
@@ -546,7 +546,7 @@ describe('taskReducer', () => {
 
   describe('SET_ERROR action', () => {
     it('should set error message', () => {
-      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'list', error: null, sortPreferences: {} };
+      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'dashboard', error: null, sortPreferences: {} };
       const action = { type: 'SET_ERROR' as const, payload: 'Test error' };
 
       const newState = taskReducer(state, action);
@@ -557,7 +557,7 @@ describe('taskReducer', () => {
 
   describe('CLEAR_ERROR action', () => {
     it('should clear error message', () => {
-      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'list', error: 'Existing error', sortPreferences: {} };
+      const state: TaskState = { lists: [], tasks: [], activeListId: null, activeView: 'dashboard', error: 'Existing error', sortPreferences: {} };
       const action = { type: 'CLEAR_ERROR' as const };
 
       const newState = taskReducer(state, action);
@@ -579,7 +579,7 @@ describe('taskReducer', () => {
     it('should set view to list', () => {
       const state = createStateWithList();
       state.activeView = 'calendar';
-      const action = { type: 'SET_VIEW' as const, payload: 'list' as const };
+      const action = { type: 'SET_VIEW' as const, payload: 'dashboard' as const };
 
       const newState = taskReducer(state, action);
 
