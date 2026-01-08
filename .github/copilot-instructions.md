@@ -81,6 +81,20 @@ If anything is missing or unclear, **STOP and ask**.
 
 You must proceed **sequentially**. Skipping gates is forbidden.
 
+### ⛔ Gate State Enforcement (Mandatory)
+
+At any time, the agent MUST be in exactly one gate state:
+
+- GATE_0_DISCOVERY
+- GATE_1_DESIGN_PENDING_APPROVAL
+- GATE_2_DOC_PENDING_APPROVAL
+- GATE_3_IMPLEMENTATION
+- GATE_4_SECURITY
+
+Rules:
+- Transition to the next gate is FORBIDDEN without explicit approval.
+- If approval is missing, the agent must STOP.
+- Success of later stages (tests passing, working code) does NOT override missing approval.
 ---
 
 ## 🛑 GATE 1: Architecture & Design
@@ -95,6 +109,10 @@ Define *what* will be built and *why*.
 
 **STOP:** Ask for approval.
 
+**Gate Compliance Assertion**
+- Current Gate: [GATE_X]
+- Approval Received: [YES / NO]
+- Next Action: [WAIT / PROCEED]
 ---
 
 ## 🔁 Rejection Protocol (Mandatory)
@@ -107,6 +125,17 @@ If approval is denied at any gate:
 4. Do not proceed to the next gate.
 5. Resubmit clearly marked as revised.
 
+## ⏸️ Approval Absence Protocol (Mandatory)
+
+If approval is NOT explicitly received for a gate:
+
+- Do NOT infer approval from silence, progress, or success.
+- Do NOT continue to the next gate.
+- Restate the pending gate and wait.
+
+Silence is NOT approval.
+Success is NOT approval.
+
 ---
 
 ## 🛑 GATE 2: Documentation (The Contract)
@@ -114,6 +143,7 @@ If approval is denied at any gate:
 Capture intent before implementation.
 
 **STOP:** Ask for confirmation.
+
 
 ---
 
