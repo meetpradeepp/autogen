@@ -22,14 +22,12 @@ export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskMo
   
   // List selection state
   // Priority: forceListId (read-only) > task's current list (edit mode) > first available list (create mode)
-  const getInitialListId = (): string => {
+  const [selectedListId, setSelectedListId] = useState<string>(() => {
     if (forceListId) return forceListId;
     if (task?.listId) return task.listId;
     // For create mode from calendar: default to first list or empty string
     return state.lists.length > 0 ? state.lists[0].id : '';
-  };
-  
-  const [selectedListId, setSelectedListId] = useState<string>(getInitialListId());
+  });
 
   // Initialize due date from task or initialDueDate
   useEffect(() => {
