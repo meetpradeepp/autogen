@@ -139,7 +139,6 @@
   font-size: 0.75rem;
   color: white;
   font-weight: 500;
-  cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   white-space: nowrap;
   overflow: hidden;
@@ -147,11 +146,36 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  position: relative;
 }
 
 .taskPill:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.editIconButton {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  color: #4a5568;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  transition: all 0.2s;
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0;
+  line-height: 1;
+}
+
+.taskPill:hover .editIconButton {
+  opacity: 1;
+}
+
+.editIconButton:hover {
+  background: white;
+  transform: scale(1.1);
 }
 
 .priorityIcon {
@@ -255,7 +279,6 @@
   background: #f7fafc;
   border-radius: 6px;
   border-left: 4px solid;
-  cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -265,6 +288,29 @@
 .popoverTask:hover {
   background: #edf2f7;
   transform: translateX(2px);
+}
+
+.popoverEditButton {
+  background: transparent;
+  border: none;
+  color: #4a5568;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 3px;
+  transition: all 0.2s;
+  margin-left: auto;
+  opacity: 0;
+  line-height: 1;
+}
+
+.popoverTask:hover .popoverEditButton {
+  opacity: 1;
+}
+
+.popoverEditButton:hover {
+  background: #e2e8f0;
+  transform: scale(1.1);
 }
 
 /* Mobile agenda view - hidden on desktop */
@@ -339,7 +385,6 @@
     background: white;
     border-radius: 6px;
     border-left: 4px solid;
-    cursor: pointer;
     transition: all 0.2s;
     display: flex;
     align-items: center;
@@ -350,6 +395,29 @@
   .agendaTask:hover {
     transform: translateX(2px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .agendaEditButton {
+    background: transparent;
+    border: none;
+    color: #4a5568;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 3px;
+    transition: all 0.2s;
+    margin-left: auto;
+    opacity: 0;
+    line-height: 1;
+  }
+
+  .agendaTask:hover .agendaEditButton {
+    opacity: 1;
+  }
+
+  .agendaEditButton:hover {
+    background: #e2e8f0;
+    transform: scale(1.1);
   }
 
   .agendaEmpty {

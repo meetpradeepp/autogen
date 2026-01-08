@@ -186,6 +186,49 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       }
     }
 
+    case 'UPDATE_TASK': {
+      try {
+        const { id, description, priority, dueDate } = action.payload;
+        
+        // Validate task exists
+        const taskExists = state.tasks.find(task => task.id === id);
+        if (!taskExists) {
+          return {
+            ...state,
+            error: 'Task not found',
+          };
+        }
+
+        // Validate description
+        const validatedDescription = validateTaskDescription(description);
+        
+        // Update the task
+        const updatedTasks = state.tasks.map(task =>
+          task.id === id
+            ? {
+                ...task,
+                description: validatedDescription,
+                priority,
+                dueDate,
+              }
+            : task
+        );
+        
+        const newState = {
+          ...state,
+          tasks: updatedTasks,
+          error: null,
+        };
+        saveState(newState);
+        return newState;
+      } catch (error) {
+        return {
+          ...state,
+          error: error instanceof Error ? error.message : 'Failed to update task',
+        };
+      }
+    }
+
     case 'DELETE_TASK': {
       const updatedTasks = state.tasks.filter(task => task.id !== action.payload);
       const newState = {

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
+import { EditTaskModal } from './EditTaskModal';
 import { Task } from './types';
 import styles from './CalendarView.module.css';
 
@@ -24,6 +25,7 @@ export function CalendarView() {
   const { state } = useTaskContext();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showPopover, setShowPopover] = useState<{ date: string; tasks: Task[] } | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   // Generate calendar grid for current month
   const calendarDays = useMemo(() => {
@@ -125,8 +127,12 @@ export function CalendarView() {
   // Handle clicking on a task
   const handleTaskClick = (task: Task, e: React.MouseEvent) => {
     e.stopPropagation();
-    // Open edit task modal (placeholder for FE-205)
-    alert(`Edit task: ${task.description} (Feature coming in FE-205)`);
+    // Open edit task modal
+    setEditingTask(task);
+  };
+
+  const handleCloseModal = () => {
+    setEditingTask(null);
   };
 
   // Show popover with all tasks for a day
@@ -202,13 +208,19 @@ export function CalendarView() {
                   key={task.id}
                   className={styles.taskPill}
                   style={{ backgroundColor: getListColor(task.listId) }}
-                  onClick={(e) => handleTaskClick(task, e)}
                   title={task.description}
                 >
                   <span className={styles.priorityIcon}>
                     {getPriorityIcon(task.priority)}
                   </span>
                   <span className={styles.taskText}>{task.description}</span>
+                  <button
+                    className={styles.editIconButton}
+                    onClick={(e) => handleTaskClick(task, e)}
+                    aria-label={`Edit task: ${task.description}`}
+                  >
+                    ✏️
+                  </button>
                 </div>
               ))}
               {day.tasks.length > 3 && (
@@ -246,12 +258,18 @@ export function CalendarView() {
                   key={task.id}
                   className={styles.popoverTask}
                   style={{ borderLeftColor: getListColor(task.listId) }}
-                  onClick={(e) => handleTaskClick(task, e)}
                 >
                   <span className={styles.priorityIcon}>
                     {getPriorityIcon(task.priority)}
                   </span>
                   <span className={styles.taskText}>{task.description}</span>
+                  <button
+                    className={styles.popoverEditButton}
+                    onClick={(e) => handleTaskClick(task, e)}
+                    aria-label={`Edit task: ${task.description}`}
+                  >
+                    ✏️
+                  </button>
                 </div>
               ))}
             </div>
@@ -279,12 +297,18 @@ export function CalendarView() {
                     key={task.id}
                     className={styles.agendaTask}
                     style={{ borderLeftColor: getListColor(task.listId) }}
-                    onClick={(e) => handleTaskClick(task, e)}
                   >
                     <span className={styles.priorityIcon}>
                       {getPriorityIcon(task.priority)}
                     </span>
                     <span className={styles.taskText}>{task.description}</span>
+                    <button
+                      className={styles.agendaEditButton}
+                      onClick={(e) => handleTaskClick(task, e)}
+                      aria-label={`Edit task: ${task.description}`}
+                    >
+                      ✏️
+                    </button>
                   </div>
                 ))}
               </div>
@@ -294,6 +318,13 @@ export function CalendarView() {
           <p className={styles.agendaEmpty}>No scheduled tasks this month</p>
         )}
       </div>
+      
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

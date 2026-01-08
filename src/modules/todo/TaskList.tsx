@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { useToast } from '../../context/ToastContext';
 import { TaskItem } from './TaskItem';
+import { EditTaskModal } from './EditTaskModal';
 import { Task, SortOption } from './types';
 import styles from './TaskList.module.css';
 
@@ -28,6 +30,7 @@ function sortTasks(tasks: Task[], sortOption: SortOption): Task[] {
 export function TaskList() {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   // Get current sort preference for active list (default: dateAdded)
   const currentSort: SortOption = state.activeListId 
@@ -37,6 +40,14 @@ export function TaskList() {
   const handleDelete = (id: string) => {
     dispatch({ type: 'DELETE_TASK', payload: id });
     showToast('Task deleted');
+  };
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+  };
+
+  const handleCloseModal = () => {
+    setEditingTask(null);
   };
 
   const handleSortChange = (sortOption: SortOption) => {
@@ -97,9 +108,21 @@ export function TaskList() {
       )}
       <div className={styles.taskList}>
         {sortedTasks.map((task) => (
-          <TaskItem key={task.id} task={task} onDelete={handleDelete} />
+          <TaskItem 
+            key={task.id} 
+            task={task} 
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
         ))}
       </div>
+      
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

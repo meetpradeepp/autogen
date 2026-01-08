@@ -31,6 +31,7 @@ export interface TaskState {
 
 export type TaskAction =
   | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId'> }
+  | { type: 'UPDATE_TASK'; payload: { id: string; description: string; priority: Priority; dueDate?: number } }
   | { type: 'DELETE_TASK'; payload: string }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'CLEAR_ERROR' }

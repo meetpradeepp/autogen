@@ -85,6 +85,38 @@
   color: #718096;
 }
 
+.actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.taskItem:hover .actions {
+  opacity: 1;
+}
+
+.editButton {
+  background: transparent;
+  border: none;
+  color: #a0aec0;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.editButton:hover {
+  background: #e6f7ff;
+  color: #4a90e2;
+}
+
+.editButton:active {
+  transform: scale(0.95);
+}
+
 .deleteButton {
   background: transparent;
   border: none;
@@ -123,6 +155,11 @@
 
 .taskItem.compact .description {
   font-size: 0.875rem;
+}
+
+.taskItem.compact .editButton {
+  font-size: 1rem;
+  padding: 0.25rem;
 }
 
 .taskItem.compact .deleteButton {
