@@ -31,6 +31,11 @@ export function Sidebar() {
     }
   };
 
+  /**
+   * Switch to a specific list and ensure we're in dashboard view.
+   * This provides a consistent UX: when a user selects a list,
+   * they should see that list's tasks in the dashboard view.
+   */
   const handleSwitchList = (listId: string) => {
     dispatch({ type: 'SWITCH_LIST', payload: listId });
     // When switching to a list, ensure we're in dashboard view

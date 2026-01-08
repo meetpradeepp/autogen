@@ -74,6 +74,16 @@ function saveState(state: TaskState): void {
 }
 
 /**
+ * Migrate activeView from old 'list' format to new 'dashboard' format
+ */
+function migrateActiveView(activeView: unknown): 'dashboard' | 'calendar' {
+  if (activeView === 'list') {
+    return 'dashboard';
+  }
+  return (activeView === 'calendar' ? 'calendar' : 'dashboard');
+}
+
+/**
  * Load state from localStorage with migration support
  */
 export function loadState(): TaskState {
@@ -93,7 +103,7 @@ export function loadState(): TaskState {
         lists: migratedLists,
         tasks: parsed.tasks || [],
         activeListId: parsed.activeListId || null,
-        activeView: parsed.activeView === 'list' ? 'dashboard' : (parsed.activeView || 'dashboard'),
+        activeView: migrateActiveView(parsed.activeView),
         error: null,
         sortPreferences: parsed.sortPreferences || {},
       };
