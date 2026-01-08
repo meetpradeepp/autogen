@@ -121,9 +121,14 @@ export function CalendarView() {
     if (e) {
       e.stopPropagation();
     }
-    // Set due date to end of day (23:59:59) so task appears on that day
+    // Set due date to end of day (23:59:59.999) so task appears on that day
+    const END_OF_DAY_HOURS = 23;
+    const END_OF_DAY_MINUTES = 59;
+    const END_OF_DAY_SECONDS = 59;
+    const END_OF_DAY_MILLISECONDS = 999;
+    
     const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    endOfDay.setHours(END_OF_DAY_HOURS, END_OF_DAY_MINUTES, END_OF_DAY_SECONDS, END_OF_DAY_MILLISECONDS);
     setCreatingTaskForDate(endOfDay.getTime());
   };
 

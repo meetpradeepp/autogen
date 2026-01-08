@@ -108,11 +108,14 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
         onClose();
       }
     } else {
-      // In create mode, check if a new task was added
-      const newestTask = state.tasks[0]; // Tasks are prepended
-      if (newestTask && 
-          newestTask.description === description && 
-          newestTask.priority === priority) {
+      // In create mode, find task matching our input (newest task with matching criteria)
+      // Check tasks in reverse chronological order to find the most recently created
+      const matchingTask = state.tasks.find(t => 
+        t.description === description && 
+        t.priority === priority
+      );
+      
+      if (matchingTask) {
         // Task was created successfully
         showToast('Task created successfully');
         setIsSubmitting(false);
