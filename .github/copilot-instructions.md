@@ -143,6 +143,41 @@ Do not proceed to the next gate until you receive user confirmation.
 1.  Tests
 2.  Implementation
 
+** Code Hygiene & Philosophy (Strict Enforcement)**
+1. The "YAGNI" Defense (No Premature Optimization)
+	Rule: Implement only what is required for the current ticket.
+	FORBIDDEN: Creating generic interfaces (IUserStrategy) if there is only one implementation (UserStrategy).
+	FORBIDDEN: "Future-proofing" logic for features that do not exist yet.
+	FORBIDDEN: Custom caching layers unless performance requirements explicitly demand it.
+	
+	Guideline: "Make it work, make it right, make it fast" — in that order.
+
+2. Cognitive Load Management (Human Maintainability)
+	Rule: Code is read 10x more than it is written. Optimize for the reader.
+	Cyclomatic Complexity: If a method requires deep nesting (3+ levels of indentation), refactor immediately into private helper methods.
+	
+	Variable Naming: Use noun for objects and verb for methods.
+		Bad: data, obj, handle()
+		Good: customerProfile, billingRecord, calculateTax()
+
+	No Magic Numbers: Replace bare numbers/strings with named constants.
+
+3. The "Conciseness" Protocol (Anti-Bloat)
+	Rule: Use modern language features to reduce boilerplate.
+	Java: Use Records for DTOs; use Optional instead of null checks; use Streams for simple transformations.
+	Python: Use dataclasses; use list comprehensions (if readable); use type hinting instead of isinstance checks.
+	JavaScript/TS: Use Destructuring; use Optional Chaining (?.) and Nullish Coalescing (??) to avoid verbose guard clauses.
+
+4. The "Boy Scout" Refactoring Rule
+	Rule: Leave the code better than you found it, but respect scope.
+	Action: If you touch a file, fix minor formatting/linting issues in the immediate vicinity of your change.
+	Constraint: Do not reformat the entire file (this destroys git blame history).
+
+5. Comments & Documentation
+	Rule: Comment the WHY, not the WHAT.
+	Bad: // Loop through the list (Redundant)
+	Good: // We reverse iteration here to delete items safely while traversing (Context)
+
 *Immediately transition to Gate 4.*
 
 ---
