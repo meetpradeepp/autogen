@@ -18,7 +18,7 @@ export interface TodoList {
   createdAt: number;
 }
 
-export type ViewMode = 'list' | 'calendar';
+export type ViewMode = 'dashboard' | 'calendar';
 
 export interface TaskState {
   lists: TodoList[];
