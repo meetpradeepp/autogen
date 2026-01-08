@@ -1,0 +1,134 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  min-height: 100%;
+}
+
+.title {
+  margin: 0 0 2rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.widget {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.widget:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.widgetIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.widgetValue {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.widgetLabel {
+  font-size: 1rem;
+  color: #718096;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Empty State Styles */
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 4rem auto;
+}
+
+.emptyTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 1rem 0;
+}
+
+.emptyDescription {
+  font-size: 1.25rem;
+  color: #4a5568;
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+.emptyHint {
+  font-size: 1rem;
+  color: #718096;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .widget {
+    padding: 1.5rem;
+  }
+
+  .widgetIcon {
+    font-size: 2rem;
+  }
+
+  .widgetValue {
+    font-size: 2rem;
+  }
+
+  .widgetLabel {
+    font-size: 0.875rem;
+  }
+
+  .emptyState {
+    padding: 2rem 1rem;
+    margin: 2rem auto;
+  }
+
+  .emptyTitle {
+    font-size: 1.5rem;
+  }
+
+  .emptyDescription {
+    font-size: 1rem;
+  }
+}
