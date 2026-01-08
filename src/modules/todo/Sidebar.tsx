@@ -1,4 +1,5 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTaskContext } from '../../context/TaskContext';
 import { useToast } from '../../context/ToastContext';
 import { DEFAULT_COLORS } from './reducer';
@@ -7,10 +8,21 @@ import styles from './Sidebar.module.css';
 export function Sidebar() {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [newListName, setNewListName] = useState('');
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLORS[0]);
   const [isCreating, setIsCreating] = useState(false);
   const previousListCountRef = useRef(state.lists.length);
+
+  // Determine active view from URL
+  const isCalendarView = location.pathname === '/calendar';
+  const isDashboardView = location.pathname === '/' || location.pathname.startsWith('/list/');
+  
+  // Extract active list ID from URL (source of truth)
+  const activeListIdFromUrl = location.pathname.startsWith('/list/') 
+    ? location.pathname.split('/list/')[1] 
+    : null;
 
   // Close form when a list is successfully created
   useEffect(() => {
@@ -20,9 +32,11 @@ export function Sidebar() {
       setNewListName('');
       setSelectedColor(DEFAULT_COLORS[0]);
       setIsCreating(false);
+      // Navigate to the new list
+      navigate(`/list/${newList.id}`);
     }
     previousListCountRef.current = state.lists.length;
-  }, [state.lists.length, state.error, state.lists, showToast]);
+  }, [state.lists.length, state.error, state.lists, showToast, navigate]);
 
   const handleCreateList = (e: FormEvent) => {
     e.preventDefault();
@@ -32,16 +46,11 @@ export function Sidebar() {
   };
 
   /**
-   * Switch to a specific list and ensure we're in dashboard view.
-   * This provides a consistent UX: when a user selects a list,
-   * they should see that list's tasks in the dashboard view.
+   * Navigate to a specific list view.
+   * The URL is the source of truth for active list.
    */
   const handleSwitchList = (listId: string) => {
-    dispatch({ type: 'SWITCH_LIST', payload: listId });
-    // When switching to a list, ensure we're in dashboard view
-    if (state.activeView !== 'dashboard') {
-      dispatch({ type: 'SET_VIEW', payload: 'dashboard' });
-    }
+    navigate(`/list/${listId}`);
   };
 
   const handleDeleteList = (listId: string, listName: string, e: React.MouseEvent) => {
@@ -54,8 +63,16 @@ export function Sidebar() {
     );
     
     if (confirmed) {
+      // Check if we're currently viewing this list
+      const isViewingDeletedList = location.pathname === `/list/${listId}`;
+      
       dispatch({ type: 'DELETE_LIST', payload: listId });
       showToast(`List '${listName}' deleted`);
+      
+      // If we're viewing the deleted list, redirect to dashboard
+      if (isViewingDeletedList) {
+        navigate('/', { replace: true });
+      }
     }
   };
 
@@ -67,7 +84,11 @@ export function Sidebar() {
   };
 
   const handleViewChange = (view: 'dashboard' | 'calendar') => {
-    dispatch({ type: 'SET_VIEW', payload: view });
+    if (view === 'dashboard') {
+      navigate('/');
+    } else {
+      navigate('/calendar');
+    }
   };
 
   return (
@@ -80,13 +101,13 @@ export function Sidebar() {
         <nav className={styles.viewNav}>
           <button
             onClick={() => handleViewChange('dashboard')}
-            className={`${styles.viewButton} ${state.activeView === 'dashboard' ? styles.active : ''}`}
+            className={`${styles.viewButton} ${isDashboardView ? styles.active : ''}`}
           >
             📊 Dashboard
           </button>
           <button
             onClick={() => handleViewChange('calendar')}
-            className={`${styles.viewButton} ${state.activeView === 'calendar' ? styles.active : ''}`}
+            className={`${styles.viewButton} ${isCalendarView ? styles.active : ''}`}
             disabled={state.lists.length === 0}
           >
             📅 Calendar
@@ -108,7 +129,7 @@ export function Sidebar() {
               <div
                 key={list.id}
                 className={`${styles.listItem} ${
-                  state.activeListId === list.id ? styles.active : ''
+                  activeListIdFromUrl === list.id ? styles.active : ''
                 }`}
               >
                 <button

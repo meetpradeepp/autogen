@@ -52,7 +52,7 @@ describe('EditTaskModal', () => {
     lists: [{ id: 'list-1', name: 'Test List', color: '#3B82F6', createdAt: Date.now() }],
     tasks: [testTask],
     activeListId: 'list-1',
-    activeView: 'list',
+    activeView: 'dashboard',
     error: null,
     sortPreferences: {},
   };
