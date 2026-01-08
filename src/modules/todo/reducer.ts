@@ -169,11 +169,23 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
   switch (action.type) {
     case 'ADD_TASK': {
       try {
-        // Ensure there's an active list
-        if (!state.activeListId) {
+        // Determine target list: explicit listId from payload, or active list
+        const targetListId = action.payload.listId || state.activeListId;
+        
+        // Ensure there's a target list
+        if (!targetListId) {
           return {
             ...state,
             error: 'No active list selected',
+          };
+        }
+        
+        // Validate that the target list exists
+        const listExists = state.lists.some(list => list.id === targetListId);
+        if (!listExists) {
+          return {
+            ...state,
+            error: 'Target list does not exist',
           };
         }
 
@@ -183,7 +195,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           description: validatedDescription,
           priority: action.payload.priority,
           createdAt: Date.now(),
-          listId: state.activeListId,
+          listId: targetListId,
           ...(action.payload.dueDate && { dueDate: action.payload.dueDate }),
         };
         const updatedTasks = [newTask, ...state.tasks];
@@ -204,7 +216,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
 
     case 'UPDATE_TASK': {
       try {
-        const { id, description, priority, dueDate } = action.payload;
+        const { id, description, priority, dueDate, listId } = action.payload;
         
         // Validate task exists
         const taskExists = state.tasks.find(task => task.id === id);
@@ -226,6 +238,17 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           ? dueDate 
           : undefined;
         
+        // Validate target list if listId is provided (moving task)
+        if (listId !== undefined) {
+          const listExists = state.lists.some(list => list.id === listId);
+          if (!listExists) {
+            return {
+              ...state,
+              error: 'Target list does not exist',
+            };
+          }
+        }
+        
         // Update the task
         const updatedTasks = state.tasks.map(task =>
           task.id === id
@@ -234,6 +257,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
                 description: validatedDescription,
                 priority,
                 dueDate: validatedDueDate,
+                ...(listId !== undefined && { listId }),
               }
             : task
         );
