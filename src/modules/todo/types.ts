@@ -32,7 +32,7 @@ export interface TaskState {
 }
 
 export type TaskAction =
-  | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId'> & { listId?: string } }
+  | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId' | 'isCompleted'> & { listId?: string; isCompleted?: boolean } }
   | { type: 'UPDATE_TASK'; payload: { id: string; title: string; description?: string; priority: Priority; dueDate?: number; listId?: string; isCompleted?: boolean } }
   | { type: 'TOGGLE_TASK_COMPLETION'; payload: string }
   | { type: 'DELETE_TASK'; payload: string }
