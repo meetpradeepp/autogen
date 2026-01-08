@@ -68,7 +68,7 @@ describe('taskReducer', () => {
       expect(newState.tasks[1].title).toBe('Existing task');
     });
 
-    it('should reject empty task description', () => {
+    it('should reject empty task title', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
@@ -81,7 +81,7 @@ describe('taskReducer', () => {
       expect(newState.error).toBe('Task title cannot be empty');
     });
 
-    it('should reject whitespace-only task description', () => {
+    it('should reject whitespace-only task title', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
@@ -94,7 +94,7 @@ describe('taskReducer', () => {
       expect(newState.error).toBe('Task title cannot be empty');
     });
 
-    it('should trim whitespace from task description', () => {
+    it('should trim whitespace from task title', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
@@ -106,9 +106,9 @@ describe('taskReducer', () => {
       expect(newState.tasks[0].title).toBe('Task with spaces');
     });
 
-    it('should reject task description exceeding 500 characters', () => {
+    it('should reject task title exceeding 200 characters', () => {
       const state = createStateWithList();
-      const longDescription = 'a'.repeat(501);
+      const longTitle = 'a'.repeat(201);
       const action = {
         type: 'ADD_TASK' as const,
         payload: { title: longDescription, priority: 'medium' as const },
@@ -298,7 +298,7 @@ describe('taskReducer', () => {
       expect(newState.tasks).toEqual(state.tasks);
     });
 
-    it('should validate task description', () => {
+    it('should validate task title', () => {
       const state = createStateWithList();
       const tasks = [
         { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },

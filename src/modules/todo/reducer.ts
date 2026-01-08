@@ -96,10 +96,25 @@ function saveState(state: TaskState): void {
  * Handles both 'text' (pre-FE-101) and 'description' (FE-101) to 'title' migration
  */
 function migrateTask(task: any): Task {
+  // If task already has title, it's in the new format - keep both title and description
+  if (task.title) {
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description || undefined,
+      isCompleted: task.isCompleted ?? false,
+      priority: task.priority,
+      createdAt: task.createdAt,
+      listId: task.listId,
+      dueDate: task.dueDate,
+    };
+  }
+  
+  // Legacy migration: old 'description' or 'text' becomes new 'title'
   return {
     id: task.id,
-    title: task.title || task.description || task.text || 'Untitled',
-    description: task.description && task.title ? task.description : undefined,
+    title: task.description || task.text || 'Untitled',
+    description: undefined, // Legacy tasks don't have separate description
     isCompleted: task.isCompleted ?? false,
     priority: task.priority,
     createdAt: task.createdAt,
