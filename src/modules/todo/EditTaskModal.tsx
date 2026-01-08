@@ -4,24 +4,27 @@ import { useToast } from '../../context/ToastContext';
 import { Priority, Task } from './types';
 import styles from './EditTaskModal.module.css';
 
-interface EditTaskModalProps {
-  task: Task;
+interface TaskModalProps {
+  task?: Task; // Optional - undefined for create mode
+  initialDueDate?: number; // Optional - pre-filled due date for create mode
   onClose: () => void;
 }
 
-export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
+export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
-  const [description, setDescription] = useState(task.description);
-  const [priority, setPriority] = useState<Priority>(task.priority);
+  const isEditMode = !!task;
+  const [description, setDescription] = useState(task?.description || '');
+  const [priority, setPriority] = useState<Priority>(task?.priority || 'medium');
   const [dueDate, setDueDate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Initialize due date from task
+  // Initialize due date from task or initialDueDate
   useEffect(() => {
-    if (task.dueDate) {
+    const timestamp = task?.dueDate || initialDueDate;
+    if (timestamp) {
       // Convert timestamp to datetime-local format (YYYY-MM-DDTHH:MM)
-      const date = new Date(task.dueDate);
+      const date = new Date(timestamp);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
@@ -29,16 +32,17 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       setDueDate(`${year}-${month}-${day}T${hours}:${minutes}`);
     }
-  }, [task.dueDate]);
+  }, [task?.dueDate, initialDueDate]);
 
-  // Verify task still exists
+  // Verify task still exists (only in edit mode)
   useEffect(() => {
-    const taskExists = state.tasks.find(t => t.id === task.id);
+    if (!isEditMode) return;
+    const taskExists = state.tasks.find(t => t.id === task!.id);
     if (!taskExists) {
       showToast('Task not found. It may have been deleted.');
       onClose();
     }
-  }, [state.tasks, task.id, showToast, onClose]);
+  }, [state.tasks, task, isEditMode, showToast, onClose]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -57,15 +61,29 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
     }
     
     setIsSubmitting(true);
-    dispatch({
-      type: 'UPDATE_TASK',
-      payload: {
-        id: task.id,
-        description,
-        priority,
-        dueDate: dueDateTimestamp,
-      },
-    });
+    
+    if (isEditMode) {
+      // Update existing task
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: {
+          id: task!.id,
+          description,
+          priority,
+          dueDate: dueDateTimestamp,
+        },
+      });
+    } else {
+      // Create new task
+      dispatch({
+        type: 'ADD_TASK',
+        payload: {
+          description,
+          priority,
+          dueDate: dueDateTimestamp,
+        },
+      });
+    }
   };
 
   // Handle success/error after dispatch
@@ -78,17 +96,33 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
       return;
     }
     
-    // Check if our task was actually updated (success case)
-    const updatedTask = state.tasks.find(t => t.id === task.id);
-    if (updatedTask && 
-        updatedTask.description === description && 
-        updatedTask.priority === priority) {
-      // Task was updated successfully
-      showToast('Task updated successfully');
-      setIsSubmitting(false);
-      onClose();
+    if (isEditMode) {
+      // Check if our task was actually updated (success case)
+      const updatedTask = state.tasks.find(t => t.id === task!.id);
+      if (updatedTask && 
+          updatedTask.description === description && 
+          updatedTask.priority === priority) {
+        // Task was updated successfully
+        showToast('Task updated successfully');
+        setIsSubmitting(false);
+        onClose();
+      }
+    } else {
+      // In create mode, find task matching our input (newest task with matching criteria)
+      // Check tasks in reverse chronological order to find the most recently created
+      const matchingTask = state.tasks.find(t => 
+        t.description === description && 
+        t.priority === priority
+      );
+      
+      if (matchingTask) {
+        // Task was created successfully
+        showToast('Task created successfully');
+        setIsSubmitting(false);
+        onClose();
+      }
     }
-  }, [state.tasks, state.error, task.id, description, priority, isSubmitting, onClose, showToast]);
+  }, [state.tasks, state.error, task, description, priority, isSubmitting, isEditMode, onClose, showToast]);
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
@@ -108,7 +142,7 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Edit Task</h2>
+          <h2 className={styles.title}>{isEditMode ? 'Edit Task' : 'Create Task'}</h2>
           <button
             onClick={onClose}
             className={styles.closeButton}
@@ -181,7 +215,7 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
               Cancel
             </button>
             <button type="submit" className={styles.submitButton}>
-              Update Task
+              {isEditMode ? 'Update Task' : 'Create Task'}
             </button>
           </div>
         </form>
@@ -189,3 +223,6 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
     </div>
   );
 }
+
+// Keep the old name as an alias for backward compatibility
+export const EditTaskModal = TaskModal;

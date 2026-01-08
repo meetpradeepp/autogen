@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { EditTaskModal } from './EditTaskModal';
+import { TaskModal } from './EditTaskModal';
 import { ToastProvider } from '../../context/ToastContext';
 import { Task, TaskState } from './types';
 import * as TaskContext from '../../context/TaskContext';
@@ -16,7 +16,20 @@ function renderWithContext(state: TaskState, task: Task, onClose: () => void) {
   
   return render(
     <ToastProvider>
-      <EditTaskModal task={task} onClose={onClose} />
+      <TaskModal task={task} onClose={onClose} />
+    </ToastProvider>
+  );
+}
+
+function renderCreateMode(state: TaskState, onClose: () => void, initialDueDate?: number) {
+  vi.spyOn(TaskContext, 'useTaskContext').mockReturnValue({
+    state,
+    dispatch: mockDispatch,
+  });
+  
+  return render(
+    <ToastProvider>
+      <TaskModal initialDueDate={initialDueDate} onClose={onClose} />
     </ToastProvider>
   );
 }
@@ -188,6 +201,77 @@ describe('EditTaskModal', () => {
 
       const descriptionInput = screen.getByLabelText('Task description');
       expect(descriptionInput).toHaveFocus();
+    });
+  });
+
+  describe('Create Mode', () => {
+    it('should render modal in create mode with empty fields', () => {
+      const onClose = vi.fn();
+      renderCreateMode(testState, onClose);
+
+      expect(screen.getByRole('heading', { name: 'Create Task' })).toBeInTheDocument();
+      expect(screen.getByLabelText('Task description')).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Create Task' })).toBeInTheDocument();
+    });
+
+    it('should pre-populate due date when initialDueDate is provided', () => {
+      const onClose = vi.fn();
+      const dueDate = new Date('2026-01-23T23:59:59').getTime();
+      renderCreateMode(testState, onClose, dueDate);
+
+      const dueDateInput = screen.getByLabelText('Task due date') as HTMLInputElement;
+      expect(dueDateInput.value).toBe('2026-01-23T23:59');
+    });
+
+    it('should dispatch ADD_TASK action on submit in create mode', () => {
+      const onClose = vi.fn();
+      renderCreateMode(testState, onClose);
+
+      const descriptionInput = screen.getByLabelText('Task description');
+      fireEvent.change(descriptionInput, { target: { value: 'New Task' } });
+
+      const submitButton = screen.getByRole('button', { name: 'Create Task' });
+      fireEvent.click(submitButton);
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'ADD_TASK',
+        payload: expect.objectContaining({
+          description: 'New Task',
+          priority: 'medium',
+        }),
+      });
+    });
+
+    it('should include pre-filled due date in ADD_TASK payload', () => {
+      const onClose = vi.fn();
+      const dueDate = new Date('2026-01-23T23:59:59').getTime();
+      renderCreateMode(testState, onClose, dueDate);
+
+      const descriptionInput = screen.getByLabelText('Task description');
+      fireEvent.change(descriptionInput, { target: { value: 'Calendar Task' } });
+
+      const submitButton = screen.getByRole('button', { name: 'Create Task' });
+      fireEvent.click(submitButton);
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'ADD_TASK',
+        payload: expect.objectContaining({
+          description: 'Calendar Task',
+          priority: 'medium',
+          dueDate: expect.any(Number),
+        }),
+      });
+    });
+
+    it('should allow editing pre-filled due date', () => {
+      const onClose = vi.fn();
+      const dueDate = new Date('2026-01-23T23:59:59').getTime();
+      renderCreateMode(testState, onClose, dueDate);
+
+      const dueDateInput = screen.getByLabelText('Task due date') as HTMLInputElement;
+      fireEvent.change(dueDateInput, { target: { value: '2026-01-25T14:00' } });
+
+      expect(dueDateInput.value).toBe('2026-01-25T14:00');
     });
   });
 });

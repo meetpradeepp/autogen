@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
-import { EditTaskModal } from './EditTaskModal';
+import { TaskModal } from './EditTaskModal';
 import { Task } from './types';
 import styles from './CalendarView.module.css';
 import { formatCreatedDate } from './utils';
@@ -27,6 +27,7 @@ export function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showPopover, setShowPopover] = useState<{ date: string; tasks: Task[] } | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [creatingTaskForDate, setCreatingTaskForDate] = useState<number | null>(null);
 
   // Generate calendar grid for current month
   const calendarDays = useMemo(() => {
@@ -115,14 +116,20 @@ export function CalendarView() {
     return list?.color || '#CBD5E0';
   };
 
-  // Handle clicking on an empty day
-  const handleDayClick = (date: Date, tasks: Task[]) => {
-    if (tasks.length === 0) {
-      // Pre-fill task form with this date
-      // For now, just show a message (task editing will be implemented in FE-205)
-      const dateStr = date.toLocaleDateString();
-      alert(`Add task for ${dateStr} (Feature coming in FE-205)`);
+  // Handle clicking on an empty day or add button
+  const handleAddTaskForDate = (date: Date, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
     }
+    // Set due date to end of day (23:59:59.999) so task appears on that day
+    const END_OF_DAY_HOURS = 23;
+    const END_OF_DAY_MINUTES = 59;
+    const END_OF_DAY_SECONDS = 59;
+    const END_OF_DAY_MILLISECONDS = 999;
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(END_OF_DAY_HOURS, END_OF_DAY_MINUTES, END_OF_DAY_SECONDS, END_OF_DAY_MILLISECONDS);
+    setCreatingTaskForDate(endOfDay.getTime());
   };
 
   // Handle clicking on a task
@@ -134,6 +141,7 @@ export function CalendarView() {
 
   const handleCloseModal = () => {
     setEditingTask(null);
+    setCreatingTaskForDate(null);
   };
 
   // Show popover with all tasks for a day
@@ -200,9 +208,18 @@ export function CalendarView() {
                 ? styles.today
                 : ''
             }`}
-            onClick={() => handleDayClick(day.date, day.tasks)}
           >
-            <div className={styles.dayNumber}>{day.date.getDate()}</div>
+            <div className={styles.dayCellHeader}>
+              <div className={styles.dayNumber}>{day.date.getDate()}</div>
+              <button
+                className={styles.addButton}
+                onClick={(e) => handleAddTaskForDate(day.date, e)}
+                aria-label={`Add task for ${day.date.toLocaleDateString()}`}
+                title="Add task for this day"
+              >
+                +
+              </button>
+            </div>
             <div className={styles.taskContainer}>
               {day.tasks.slice(0, 3).map(task => (
                 <div
@@ -321,8 +338,15 @@ export function CalendarView() {
       </div>
       
       {editingTask && (
-        <EditTaskModal
+        <TaskModal
           task={editingTask}
+          onClose={handleCloseModal}
+        />
+      )}
+      
+      {creatingTaskForDate && (
+        <TaskModal
+          initialDueDate={creatingTaskForDate}
           onClose={handleCloseModal}
         />
       )}
