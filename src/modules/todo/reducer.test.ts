@@ -244,6 +244,95 @@ describe('taskReducer', () => {
     });
   });
 
+  describe('UPDATE_TASK action', () => {
+    it('should update task with matching ID', () => {
+      const state = createStateWithList();
+      const tasks = [
+        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '2', description: 'Task 2', priority: 'medium' as const, createdAt: Date.now(), listId: 'test-list-id' },
+      ];
+      state.tasks = tasks;
+      const action = {
+        type: 'UPDATE_TASK' as const,
+        payload: { id: '1', description: 'Updated Task 1', priority: 'low' as const },
+      };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.tasks).toHaveLength(2);
+      const updatedTask = newState.tasks.find(t => t.id === '1');
+      expect(updatedTask?.description).toBe('Updated Task 1');
+      expect(updatedTask?.priority).toBe('low');
+      expect(newState.error).toBeNull();
+    });
+
+    it('should update task due date', () => {
+      const state = createStateWithList();
+      const tasks = [
+        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+      ];
+      state.tasks = tasks;
+      const dueDate = new Date('2026-01-15T10:00').getTime();
+      const action = {
+        type: 'UPDATE_TASK' as const,
+        payload: { id: '1', description: 'Task 1', priority: 'high' as const, dueDate },
+      };
+
+      const newState = taskReducer(state, action);
+
+      const updatedTask = newState.tasks.find(t => t.id === '1');
+      expect(updatedTask?.dueDate).toBe(dueDate);
+    });
+
+    it('should return error if task not found', () => {
+      const state = createStateWithList();
+      const action = {
+        type: 'UPDATE_TASK' as const,
+        payload: { id: 'non-existent', description: 'Test', priority: 'high' as const },
+      };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.error).toBe('Task not found');
+      expect(newState.tasks).toEqual(state.tasks);
+    });
+
+    it('should validate task description', () => {
+      const state = createStateWithList();
+      const tasks = [
+        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+      ];
+      state.tasks = tasks;
+      const action = {
+        type: 'UPDATE_TASK' as const,
+        payload: { id: '1', description: '   ', priority: 'high' as const },
+      };
+
+      const newState = taskReducer(state, action);
+
+      expect(newState.error).toBe('Task cannot be empty');
+    });
+
+    it('should update localStorage after update', () => {
+      const state = createStateWithList();
+      const tasks = [
+        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+      ];
+      state.tasks = tasks;
+      const action = {
+        type: 'UPDATE_TASK' as const,
+        payload: { id: '1', description: 'Updated', priority: 'low' as const },
+      };
+
+      taskReducer(state, action);
+
+      const stored = localStorage.getItem('taskManagerState');
+      const parsedState = JSON.parse(stored!);
+      expect(parsedState.tasks[0].description).toBe('Updated');
+      expect(parsedState.tasks[0].priority).toBe('low');
+    });
+  });
+
   describe('CREATE_LIST action', () => {
     it('should create a new list and set it as active', () => {
       const state: TaskState = {
