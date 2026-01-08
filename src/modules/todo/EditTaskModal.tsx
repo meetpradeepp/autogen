@@ -43,11 +43,17 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
+    // Maximum valid JavaScript timestamp
+    const MAX_SAFE_TIMESTAMP = 8640000000000000;
+    
     // Convert datetime-local string to timestamp if provided
     let dueDateTimestamp: number | undefined;
     if (dueDate) {
       const timestamp = new Date(dueDate).getTime();
-      dueDateTimestamp = !isNaN(timestamp) ? timestamp : undefined;
+      // Validate timestamp matches reducer validation
+      dueDateTimestamp = (isFinite(timestamp) && timestamp > 0 && timestamp <= MAX_SAFE_TIMESTAMP) 
+        ? timestamp 
+        : undefined;
     }
     
     setIsSubmitting(true);
@@ -74,7 +80,10 @@ export function EditTaskModal({ task, onClose }: EditTaskModalProps) {
     
     // Check if our task was actually updated (success case)
     const updatedTask = state.tasks.find(t => t.id === task.id);
-    if (updatedTask && updatedTask.description === description && updatedTask.priority === priority) {
+    if (updatedTask && 
+        updatedTask.description === description && 
+        updatedTask.priority === priority) {
+      // Task was updated successfully
       showToast('Task updated successfully');
       setIsSubmitting(false);
       onClose();

@@ -16,6 +16,12 @@ const DEFAULT_COLORS = [
 ];
 
 /**
+ * Maximum valid JavaScript timestamp (equivalent to Sep 13, 275760)
+ * This is the maximum value that Date can safely represent
+ */
+const MAX_SAFE_TIMESTAMP = 8640000000000000;
+
+/**
  * Validate hex color format
  * @throws Error if invalid
  */
@@ -206,7 +212,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         const validatedDueDate = (dueDate !== undefined && 
                                   isFinite(dueDate) && 
                                   dueDate > 0 && 
-                                  dueDate <= 8640000000000000) 
+                                  dueDate <= MAX_SAFE_TIMESTAMP) 
           ? dueDate 
           : undefined;
         
