@@ -3,6 +3,7 @@ import { useTaskContext } from '../../context/TaskContext';
 import { EditTaskModal } from './EditTaskModal';
 import { Task } from './types';
 import styles from './CalendarView.module.css';
+import { formatCreatedDate } from './utils';
 
 interface CalendarDay {
   date: Date;
@@ -208,7 +209,7 @@ export function CalendarView() {
                   key={task.id}
                   className={styles.taskPill}
                   style={{ backgroundColor: getListColor(task.listId) }}
-                  title={task.description}
+                  title={`${task.description} (Created: ${formatCreatedDate(task.createdAt)})`}
                 >
                   <span className={styles.priorityIcon}>
                     {getPriorityIcon(task.priority)}

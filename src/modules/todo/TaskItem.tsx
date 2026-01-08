@@ -1,6 +1,7 @@
 import { Task } from './types';
 import styles from './TaskItem.module.css';
 import { useCompactMode } from '../../context/CompactModeContext';
+import { formatCreatedDate, formatTaskAge } from './utils';
 
 interface TaskItemProps {
   task: Task;
@@ -40,6 +41,11 @@ export function TaskItem({ task, onDelete, onEdit }: TaskItemProps) {
         )}
         <div className={styles.textContent}>
           <p className={styles.description}>{task.description}</p>
+          {!compactMode && (
+            <p className={styles.metadata}>
+              Created: {formatCreatedDate(task.createdAt)} · Age: {formatTaskAge(task.createdAt)}
+            </p>
+          )}
           {task.dueDate && (
             <p className={styles.dueDate}>
               Due: {formatDueDate(task.dueDate)}
