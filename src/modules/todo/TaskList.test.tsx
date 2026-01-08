@@ -36,9 +36,10 @@ describe('TaskList Sorting', () => {
     createdAt: Date.now(),
   };
 
-  const createTask = (id: string, description: string, priority: 'high' | 'medium' | 'low', createdAt: number): Task => ({
+  const createTask = (id: string, title: string, priority: 'high' | 'medium' | 'low', createdAt: number): Task => ({
     id,
-    description,
+    title,
+    isCompleted: false,
     priority,
     createdAt,
     listId: 'list-1',

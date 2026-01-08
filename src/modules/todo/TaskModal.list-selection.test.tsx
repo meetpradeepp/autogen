@@ -163,7 +163,8 @@ describe('TaskModal - List Selection', () => {
   describe('Edit Mode (Task Moving)', () => {
     const existingTask: Task = {
       id: 'task-1',
-      description: 'Existing task',
+      title: 'Existing task',
+      isCompleted: false,
       priority: 'medium',
       createdAt: Date.now(),
       listId: 'list-1',
