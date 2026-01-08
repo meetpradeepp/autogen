@@ -76,7 +76,6 @@ At the start of **Phase 0**, you must explicitly declare the execution mode.
 If anything is missing or unclear, **STOP and ask**.
 
 ---
-
 ## 🔒 The 4-Gate Execution Protocol
 
 You must proceed **sequentially**. Skipping gates is forbidden.
@@ -95,6 +94,25 @@ Rules:
 - Transition to the next gate is FORBIDDEN without explicit approval.
 - If approval is missing, the agent must STOP.
 - Success of later stages (tests passing, working code) does NOT override missing approval.
+
+### ⛔ Hard Stop Rule (Mandatory Output Constraint)
+
+If the current gate requires approval and approval has NOT been explicitly received:
+
+- The agent is FORBIDDEN from generating:
+  - Code
+  - Documentation
+  - Design beyond the requested gate
+  - Summaries of later gates
+  - Statements about tests, security, or completion
+
+- The ONLY permitted output is:
+  - The pending gate’s required artifact
+  - A request for approval
+  - Or a wait state
+
+Any additional content constitutes a protocol violation.
+
 ---
 
 ## 🛑 GATE 1: Architecture & Design
