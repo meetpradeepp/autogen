@@ -32,6 +32,7 @@ describe('TaskList Sorting', () => {
   const testList: TodoList = {
     id: 'list-1',
     name: 'Test List',
+    color: '#3B82F6',
     createdAt: Date.now(),
   };
 
@@ -49,6 +50,7 @@ describe('TaskList Sorting', () => {
         lists: [testList],
         tasks: [],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -64,6 +66,7 @@ describe('TaskList Sorting', () => {
         lists: [testList],
         tasks: [createTask('1', 'Single task', 'high', Date.now())],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -81,6 +84,7 @@ describe('TaskList Sorting', () => {
           createTask('2', 'Task 2', 'low', Date.now() - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -102,6 +106,7 @@ describe('TaskList Sorting', () => {
           createTask('3', 'Newest', 'medium', now - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -130,6 +135,7 @@ describe('TaskList Sorting', () => {
           createTask('3', 'Medium priority', 'medium', now - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'priority' },
       };
@@ -152,6 +158,7 @@ describe('TaskList Sorting', () => {
           createTask('3', 'Medium New', 'medium', now - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'priority' },
       };
@@ -176,6 +183,7 @@ describe('TaskList Sorting', () => {
           createTask('4', 'Another low', 'low', now - 4000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'priority' },
       };
@@ -202,6 +210,7 @@ describe('TaskList Sorting', () => {
           createTask('3', 'Mango task', 'high', now - 3000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'alphabetical' },
       };
@@ -224,6 +233,7 @@ describe('TaskList Sorting', () => {
           createTask('3', 'Cherry', 'high', now - 3000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'alphabetical' },
       };
@@ -246,6 +256,7 @@ describe('TaskList Sorting', () => {
           createTask('3', 'Same Task', 'high', now - 2000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'alphabetical' },
       };
@@ -268,6 +279,7 @@ describe('TaskList Sorting', () => {
           createTask('2', 'Task 2', 'low', Date.now() - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
@@ -291,6 +303,7 @@ describe('TaskList Sorting', () => {
           createTask('2', 'Task 2', 'low', Date.now() - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: { 'list-1': 'alphabetical', 'list-2': 'priority' },
       };
@@ -311,6 +324,7 @@ describe('TaskList Sorting', () => {
           createTask('2', 'Task 2', 'low', Date.now() - 1000),
         ],
         activeListId: 'list-1',
+        activeView: 'list',
         error: null,
         sortPreferences: {},
       };
