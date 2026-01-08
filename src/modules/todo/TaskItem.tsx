@@ -5,6 +5,7 @@ import { useCompactMode } from '../../context/CompactModeContext';
 interface TaskItemProps {
   task: Task;
   onDelete: (id: string) => void;
+  onEdit: (task: Task) => void;
 }
 
 function formatDueDate(timestamp: number): string {
@@ -22,7 +23,7 @@ function isOverdue(dueDate: number): boolean {
   return dueDate < Date.now();
 }
 
-export function TaskItem({ task, onDelete }: TaskItemProps) {
+export function TaskItem({ task, onDelete, onEdit }: TaskItemProps) {
   const overdue = task.dueDate ? isOverdue(task.dueDate) : false;
   const { compactMode } = useCompactMode();
   
@@ -46,13 +47,22 @@ export function TaskItem({ task, onDelete }: TaskItemProps) {
           )}
         </div>
       </div>
-      <button
-        onClick={() => onDelete(task.id)}
-        className={styles.deleteButton}
-        aria-label={`Delete task: ${task.description}`}
-      >
-        ✕
-      </button>
+      <div className={styles.actions}>
+        <button
+          onClick={() => onEdit(task)}
+          className={styles.editButton}
+          aria-label={`Edit task: ${task.description}`}
+        >
+          ✏️
+        </button>
+        <button
+          onClick={() => onDelete(task.id)}
+          className={styles.deleteButton}
+          aria-label={`Delete task: ${task.description}`}
+        >
+          ✕
+        </button>
+      </div>
     </div>
   );
 }

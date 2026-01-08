@@ -16,6 +16,12 @@ const DEFAULT_COLORS = [
 ];
 
 /**
+ * Maximum valid JavaScript timestamp (equivalent to Sep 13, 275760)
+ * This is the maximum value that Date can safely represent
+ */
+const MAX_SAFE_TIMESTAMP = 8640000000000000;
+
+/**
  * Validate hex color format
  * @throws Error if invalid
  */
@@ -182,6 +188,57 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
         return {
           ...state,
           error: error instanceof Error ? error.message : 'Failed to add task',
+        };
+      }
+    }
+
+    case 'UPDATE_TASK': {
+      try {
+        const { id, description, priority, dueDate } = action.payload;
+        
+        // Validate task exists
+        const taskExists = state.tasks.find(task => task.id === id);
+        if (!taskExists) {
+          return {
+            ...state,
+            error: 'Task not found',
+          };
+        }
+
+        // Validate description
+        const validatedDescription = validateTaskDescription(description);
+        
+        // Validate dueDate timestamp
+        const validatedDueDate = (dueDate !== undefined && 
+                                  isFinite(dueDate) && 
+                                  dueDate > 0 && 
+                                  dueDate <= MAX_SAFE_TIMESTAMP) 
+          ? dueDate 
+          : undefined;
+        
+        // Update the task
+        const updatedTasks = state.tasks.map(task =>
+          task.id === id
+            ? {
+                ...task,
+                description: validatedDescription,
+                priority,
+                dueDate: validatedDueDate,
+              }
+            : task
+        );
+        
+        const newState = {
+          ...state,
+          tasks: updatedTasks,
+          error: null,
+        };
+        saveState(newState);
+        return newState;
+      } catch (error) {
+        return {
+          ...state,
+          error: error instanceof Error ? error.message : 'Failed to update task',
         };
       }
     }
