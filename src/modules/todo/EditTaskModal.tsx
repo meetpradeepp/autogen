@@ -7,10 +7,11 @@ import styles from './EditTaskModal.module.css';
 interface TaskModalProps {
   task?: Task; // Optional - undefined for create mode
   initialDueDate?: number; // Optional - pre-filled due date for create mode
+  forceListId?: string; // Optional - when set, list field is read-only (for list view creation)
   onClose: () => void;
 }
 
-export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
+export function TaskModal({ task, initialDueDate, forceListId, onClose }: TaskModalProps) {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
   const isEditMode = !!task;
@@ -18,6 +19,15 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
   const [priority, setPriority] = useState<Priority>(task?.priority || 'medium');
   const [dueDate, setDueDate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // List selection state
+  // Priority: forceListId (read-only) > task's current list (edit mode) > first available list (create mode)
+  const [selectedListId, setSelectedListId] = useState<string>(() => {
+    if (forceListId) return forceListId;
+    if (task?.listId) return task.listId;
+    // For create mode from calendar: default to first list or empty string
+    return state.lists.length > 0 ? state.lists[0].id : '';
+  });
 
   // Initialize due date from task or initialDueDate
   useEffect(() => {
@@ -47,6 +57,12 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
+    // Validate list selection
+    if (!selectedListId) {
+      dispatch({ type: 'SET_ERROR', payload: 'Please select a list' });
+      return;
+    }
+    
     // Maximum valid JavaScript timestamp
     const MAX_SAFE_TIMESTAMP = 8640000000000000;
     
@@ -64,6 +80,8 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
     
     if (isEditMode) {
       // Update existing task
+      // Only include listId if it changed (moving task to different list)
+      const listIdChanged = selectedListId !== task!.listId;
       dispatch({
         type: 'UPDATE_TASK',
         payload: {
@@ -71,16 +89,18 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
           description,
           priority,
           dueDate: dueDateTimestamp,
+          ...(listIdChanged && { listId: selectedListId }),
         },
       });
     } else {
-      // Create new task
+      // Create new task with explicit list selection
       dispatch({
         type: 'ADD_TASK',
         payload: {
           description,
           priority,
           dueDate: dueDateTimestamp,
+          listId: selectedListId,
         },
       });
     }
@@ -101,9 +121,11 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
       const updatedTask = state.tasks.find(t => t.id === task!.id);
       if (updatedTask && 
           updatedTask.description === description && 
-          updatedTask.priority === priority) {
-        // Task was updated successfully
-        showToast('Task updated successfully');
+          updatedTask.priority === priority &&
+          updatedTask.listId === selectedListId) {
+        // Task was updated successfully (including potential list change)
+        const wasMoved = selectedListId !== task!.listId;
+        showToast(wasMoved ? 'Task moved successfully' : 'Task updated successfully');
         setIsSubmitting(false);
         onClose();
       }
@@ -112,7 +134,8 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
       // Check tasks in reverse chronological order to find the most recently created
       const matchingTask = state.tasks.find(t => 
         t.description === description && 
-        t.priority === priority
+        t.priority === priority &&
+        t.listId === selectedListId
       );
       
       if (matchingTask) {
@@ -122,7 +145,7 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
         onClose();
       }
     }
-  }, [state.tasks, state.error, task, description, priority, isSubmitting, isEditMode, onClose, showToast]);
+  }, [state.tasks, state.error, task, description, priority, selectedListId, isSubmitting, isEditMode, onClose, showToast]);
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
@@ -167,6 +190,38 @@ export function TaskModal({ task, initialDueDate, onClose }: TaskModalProps) {
               aria-label="Task description"
               autoFocus
             />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label htmlFor="task-list" className={styles.label}>
+              Task List
+            </label>
+            {forceListId ? (
+              // Read-only mode: Show list name when creating from list view
+              <div className={styles.readOnlyField}>
+                {state.lists.find(l => l.id === forceListId)?.name || 'Unknown List'}
+              </div>
+            ) : (
+              // Editable mode: Show dropdown for calendar create and edit modes
+              <select
+                id="task-list"
+                value={selectedListId}
+                onChange={(e) => setSelectedListId(e.target.value)}
+                className={styles.select}
+                aria-label="Task list"
+                disabled={state.lists.length === 0}
+              >
+                {state.lists.length === 0 ? (
+                  <option value="">No lists available</option>
+                ) : (
+                  state.lists.map(list => (
+                    <option key={list.id} value={list.id}>
+                      {list.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            )}
           </div>
           
           <div className={styles.formGroup}>
