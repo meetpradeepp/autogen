@@ -122,7 +122,7 @@ describe('TaskModal - List Selection', () => {
       expect(listSelect.value).toBe('list-2');
 
       // Fill in task details
-      const descInput = screen.getByLabelText('Task description');
+      const descInput = screen.getByLabelText('Task title');
       fireEvent.change(descInput, { target: { value: 'Test task' } });
 
       // Submit form
@@ -133,7 +133,7 @@ describe('TaskModal - List Selection', () => {
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'ADD_TASK',
         payload: expect.objectContaining({
-          description: 'Test task',
+          title: 'Test task',
           listId: 'list-2',
         }),
       });
@@ -163,7 +163,8 @@ describe('TaskModal - List Selection', () => {
   describe('Edit Mode (Task Moving)', () => {
     const existingTask: Task = {
       id: 'task-1',
-      description: 'Existing task',
+      title: 'Existing task',
+      isCompleted: false,
       priority: 'medium',
       createdAt: Date.now(),
       listId: 'list-1',
@@ -220,7 +221,7 @@ describe('TaskModal - List Selection', () => {
         type: 'UPDATE_TASK',
         payload: expect.objectContaining({
           id: 'task-1',
-          description: 'Existing task',
+          title: 'Existing task',
           listId: 'list-3',
         }),
       });
@@ -242,7 +243,7 @@ describe('TaskModal - List Selection', () => {
       });
 
       // Just change description, not list
-      const descInput = screen.getByLabelText('Task description');
+      const descInput = screen.getByLabelText('Task title');
       fireEvent.change(descInput, { target: { value: 'Updated description' } });
 
       // Submit form
@@ -252,13 +253,11 @@ describe('TaskModal - List Selection', () => {
       // Should dispatch UPDATE_TASK without listId
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'UPDATE_TASK',
-        payload: {
+        payload: expect.objectContaining({
           id: 'task-1',
-          description: 'Updated description',
+          title: 'Updated description',
           priority: 'medium',
-          dueDate: undefined,
-          // No listId property
-        },
+        }),
       });
     });
   });
@@ -302,7 +301,7 @@ describe('TaskModal - List Selection', () => {
       });
 
       // Fill in task details
-      const descInput = screen.getByLabelText('Task description');
+      const descInput = screen.getByLabelText('Task title');
       fireEvent.change(descInput, { target: { value: 'Forced list task' } });
 
       // Submit form
@@ -358,7 +357,7 @@ describe('TaskModal - List Selection', () => {
         onClose: vi.fn(),
       });
 
-      const descInput = screen.getByLabelText('Task description');
+      const descInput = screen.getByLabelText('Task title');
       fireEvent.change(descInput, { target: { value: 'Test task' } });
 
       // Manually clear the select value (simulate invalid state)

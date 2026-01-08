@@ -41,7 +41,8 @@ describe('EditTaskModal', () => {
 
   const testTask: Task = {
     id: 'task-1',
-    description: 'Test Task',
+    title: 'Test Task',
+    isCompleted: false,
     priority: 'medium',
     createdAt: Date.now(),
     listId: 'list-1',
@@ -88,8 +89,8 @@ describe('EditTaskModal', () => {
       const onClose = vi.fn();
       renderWithContext(testState, testTask, onClose);
 
-      const descriptionInput = screen.getByDisplayValue('Test Task');
-      fireEvent.change(descriptionInput, { target: { value: 'Updated Task' } });
+      const titleInput = screen.getByDisplayValue('Test Task');
+      fireEvent.change(titleInput, { target: { value: 'Updated Task' } });
 
       const submitButton = screen.getByText('Update Task');
       fireEvent.click(submitButton);
@@ -98,7 +99,7 @@ describe('EditTaskModal', () => {
         type: 'UPDATE_TASK',
         payload: expect.objectContaining({
           id: 'task-1',
-          description: 'Updated Task',
+          title: 'Updated Task',
           priority: 'medium',
         }),
       });
@@ -190,7 +191,7 @@ describe('EditTaskModal', () => {
       const onClose = vi.fn();
       renderWithContext(testState, testTask, onClose);
 
-      expect(screen.getByLabelText('Task description')).toBeInTheDocument();
+      expect(screen.getByLabelText('Task title')).toBeInTheDocument();
       expect(screen.getByLabelText('Task priority')).toBeInTheDocument();
       expect(screen.getByLabelText('Task due date')).toBeInTheDocument();
     });
@@ -199,7 +200,7 @@ describe('EditTaskModal', () => {
       const onClose = vi.fn();
       renderWithContext(testState, testTask, onClose);
 
-      const descriptionInput = screen.getByLabelText('Task description');
+      const descriptionInput = screen.getByLabelText('Task title');
       expect(descriptionInput).toHaveFocus();
     });
   });
@@ -210,7 +211,7 @@ describe('EditTaskModal', () => {
       renderCreateMode(testState, onClose);
 
       expect(screen.getByRole('heading', { name: 'Create Task' })).toBeInTheDocument();
-      expect(screen.getByLabelText('Task description')).toHaveValue('');
+      expect(screen.getByLabelText('Task title')).toHaveValue('');
       expect(screen.getByRole('button', { name: 'Create Task' })).toBeInTheDocument();
     });
 
@@ -227,7 +228,7 @@ describe('EditTaskModal', () => {
       const onClose = vi.fn();
       renderCreateMode(testState, onClose);
 
-      const descriptionInput = screen.getByLabelText('Task description');
+      const descriptionInput = screen.getByLabelText('Task title');
       fireEvent.change(descriptionInput, { target: { value: 'New Task' } });
 
       const submitButton = screen.getByRole('button', { name: 'Create Task' });
@@ -247,7 +248,7 @@ describe('EditTaskModal', () => {
       const dueDate = new Date('2026-01-23T23:59:59').getTime();
       renderCreateMode(testState, onClose, dueDate);
 
-      const descriptionInput = screen.getByLabelText('Task description');
+      const descriptionInput = screen.getByLabelText('Task title');
       fireEvent.change(descriptionInput, { target: { value: 'Calendar Task' } });
 
       const submitButton = screen.getByRole('button', { name: 'Create Task' });

@@ -48,7 +48,7 @@ describe('TaskForm - Context-Aware Rendering', () => {
       
       // TaskForm should render nothing (null)
       expect(container.firstChild).toBeNull();
-      expect(screen.queryByPlaceholderText('Enter task description...')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Task title (required)...')).not.toBeInTheDocument();
       expect(screen.queryByText('Add Task')).not.toBeInTheDocument();
     });
 
@@ -65,7 +65,7 @@ describe('TaskForm - Context-Aware Rendering', () => {
       const { container } = renderWithContext(state);
       
       expect(container.firstChild).toBeNull();
-      expect(screen.queryByPlaceholderText('Enter task description...')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Task title (required)...')).not.toBeInTheDocument();
     });
 
     it('should render when activeListId is set (list selected)', () => {
@@ -81,7 +81,7 @@ describe('TaskForm - Context-Aware Rendering', () => {
       renderWithContext(state);
       
       // TaskForm should be visible
-      expect(screen.getByPlaceholderText('Enter task description...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Task title (required)...')).toBeInTheDocument();
       expect(screen.getByText('Add Task')).toBeInTheDocument();
       expect(screen.getByLabelText('Task priority')).toBeInTheDocument();
     });
@@ -99,7 +99,7 @@ describe('TaskForm - Context-Aware Rendering', () => {
       const { rerender, container } = renderWithContext(state);
       
       // Initially visible
-      expect(screen.getByPlaceholderText('Enter task description...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Task title (required)...')).toBeInTheDocument();
 
       // Simulate list deletion - activeListId becomes null
       const stateAfterDeletion: TaskState = {
@@ -121,7 +121,7 @@ describe('TaskForm - Context-Aware Rendering', () => {
 
       // Should now be hidden
       expect(container.firstChild).toBeNull();
-      expect(screen.queryByPlaceholderText('Enter task description...')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Task title (required)...')).not.toBeInTheDocument();
     });
 
     it('should prevent "No active list selected" error from appearing in UI', () => {

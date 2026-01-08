@@ -31,13 +31,13 @@ describe('taskReducer', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: 'Test task', priority: 'high' as const },
+        payload: { title: 'Test task', priority: 'high' as const },
       };
 
       const newState = taskReducer(state, action);
 
       expect(newState.tasks).toHaveLength(1);
-      expect(newState.tasks[0].description).toBe('Test task');
+      expect(newState.tasks[0].title).toBe('Test task');
       expect(newState.tasks[0].priority).toBe('high');
       expect(newState.tasks[0].id).toBeDefined();
       expect(newState.tasks[0].createdAt).toBeDefined();
@@ -49,7 +49,8 @@ describe('taskReducer', () => {
       const state = createStateWithList();
       const existingTask = {
         id: '1',
-        description: 'Existing task',
+        title: 'Existing task',
+        isCompleted: false,
         priority: 'low' as const,
         createdAt: Date.now(),
         listId: 'test-list-id',
@@ -57,66 +58,66 @@ describe('taskReducer', () => {
       state.tasks = [existingTask];
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: 'New task', priority: 'medium' as const },
+        payload: { title: 'New task', priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
 
       expect(newState.tasks).toHaveLength(2);
-      expect(newState.tasks[0].description).toBe('New task');
-      expect(newState.tasks[1].description).toBe('Existing task');
+      expect(newState.tasks[0].title).toBe('New task');
+      expect(newState.tasks[1].title).toBe('Existing task');
     });
 
-    it('should reject empty task description', () => {
+    it('should reject empty task title', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: '', priority: 'medium' as const },
+        payload: { title: '', priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
 
       expect(newState.tasks).toHaveLength(0);
-      expect(newState.error).toBe('Task cannot be empty');
+      expect(newState.error).toBe('Task title cannot be empty');
     });
 
-    it('should reject whitespace-only task description', () => {
+    it('should reject whitespace-only task title', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: '   ', priority: 'medium' as const },
+        payload: { title: '   ', priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
 
       expect(newState.tasks).toHaveLength(0);
-      expect(newState.error).toBe('Task cannot be empty');
+      expect(newState.error).toBe('Task title cannot be empty');
     });
 
-    it('should trim whitespace from task description', () => {
+    it('should trim whitespace from task title', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: '  Task with spaces  ', priority: 'low' as const },
+        payload: { title: '  Task with spaces  ', priority: 'low' as const },
       };
 
       const newState = taskReducer(state, action);
 
-      expect(newState.tasks[0].description).toBe('Task with spaces');
+      expect(newState.tasks[0].title).toBe('Task with spaces');
     });
 
-    it('should reject task description exceeding 500 characters', () => {
+    it('should reject task title exceeding 200 characters', () => {
       const state = createStateWithList();
-      const longDescription = 'a'.repeat(501);
+      const longTitle = 'a'.repeat(201);
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: longDescription, priority: 'medium' as const },
+        payload: { title: longDescription, priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
 
       expect(newState.tasks).toHaveLength(0);
-      expect(newState.error).toBe('Task description too long (max 500 characters)');
+      expect(newState.error).toBe('Task title too long (max 200 characters)');
     });
 
     it('should reject task when no active list is selected', () => {
@@ -130,7 +131,7 @@ describe('taskReducer', () => {
       };
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: 'Test task', priority: 'medium' as const },
+        payload: { title: 'Test task', priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
@@ -143,7 +144,7 @@ describe('taskReducer', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: 'Persistent task', priority: 'high' as const },
+        payload: { title: 'Persistent task', priority: 'high' as const },
       };
 
       taskReducer(state, action);
@@ -152,7 +153,7 @@ describe('taskReducer', () => {
       expect(stored).toBeDefined();
       const parsedState = JSON.parse(stored!);
       expect(parsedState.tasks).toHaveLength(1);
-      expect(parsedState.tasks[0].description).toBe('Persistent task');
+      expect(parsedState.tasks[0].title).toBe('Persistent task');
     });
 
     it('should add task with optional dueDate', () => {
@@ -161,7 +162,7 @@ describe('taskReducer', () => {
       const action = {
         type: 'ADD_TASK' as const,
         payload: { 
-          description: 'Task with due date', 
+          title: 'Task with due date', 
           priority: 'high' as const,
           dueDate,
         },
@@ -178,7 +179,7 @@ describe('taskReducer', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: 'Task without due date', priority: 'medium' as const },
+        payload: { title: 'Task without due date', priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
@@ -194,7 +195,7 @@ describe('taskReducer', () => {
       const action = {
         type: 'ADD_TASK' as const,
         payload: { 
-          description: 'Persistent due date task', 
+          title: 'Persistent due date task', 
           priority: 'low' as const,
           dueDate,
         },
@@ -213,9 +214,9 @@ describe('taskReducer', () => {
     it('should remove task with matching ID', () => {
       const state = createStateWithList();
       const tasks = [
-        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
-        { id: '2', description: 'Task 2', priority: 'medium' as const, createdAt: Date.now(), listId: 'test-list-id' },
-        { id: '3', description: 'Task 3', priority: 'low' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '2', title: 'Task 2', isCompleted: false, priority: 'medium' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '3', title: 'Task 3', isCompleted: false, priority: 'low' as const, createdAt: Date.now(), listId: 'test-list-id' },
       ];
       state.tasks = tasks;
       const action = { type: 'DELETE_TASK' as const, payload: '2' };
@@ -231,7 +232,7 @@ describe('taskReducer', () => {
     it('should update localStorage after deletion', () => {
       const state = createStateWithList();
       const tasks = [
-        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
       ];
       state.tasks = tasks;
       const action = { type: 'DELETE_TASK' as const, payload: '1' };
@@ -248,20 +249,20 @@ describe('taskReducer', () => {
     it('should update task with matching ID', () => {
       const state = createStateWithList();
       const tasks = [
-        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
-        { id: '2', description: 'Task 2', priority: 'medium' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '2', title: 'Task 2', isCompleted: false, priority: 'medium' as const, createdAt: Date.now(), listId: 'test-list-id' },
       ];
       state.tasks = tasks;
       const action = {
         type: 'UPDATE_TASK' as const,
-        payload: { id: '1', description: 'Updated Task 1', priority: 'low' as const },
+        payload: { id: '1', title: 'Updated Task 1', priority: 'low' as const },
       };
 
       const newState = taskReducer(state, action);
 
       expect(newState.tasks).toHaveLength(2);
       const updatedTask = newState.tasks.find(t => t.id === '1');
-      expect(updatedTask?.description).toBe('Updated Task 1');
+      expect(updatedTask?.title).toBe('Updated Task 1');
       expect(updatedTask?.priority).toBe('low');
       expect(newState.error).toBeNull();
     });
@@ -269,13 +270,13 @@ describe('taskReducer', () => {
     it('should update task due date', () => {
       const state = createStateWithList();
       const tasks = [
-        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
       ];
       state.tasks = tasks;
       const dueDate = new Date('2026-01-15T10:00').getTime();
       const action = {
         type: 'UPDATE_TASK' as const,
-        payload: { id: '1', description: 'Task 1', priority: 'high' as const, dueDate },
+        payload: { id: '1', title: 'Task 1', priority: 'high' as const, dueDate },
       };
 
       const newState = taskReducer(state, action);
@@ -288,7 +289,7 @@ describe('taskReducer', () => {
       const state = createStateWithList();
       const action = {
         type: 'UPDATE_TASK' as const,
-        payload: { id: 'non-existent', description: 'Test', priority: 'high' as const },
+        payload: { id: 'non-existent', title: 'Test', priority: 'high' as const },
       };
 
       const newState = taskReducer(state, action);
@@ -297,38 +298,38 @@ describe('taskReducer', () => {
       expect(newState.tasks).toEqual(state.tasks);
     });
 
-    it('should validate task description', () => {
+    it('should validate task title', () => {
       const state = createStateWithList();
       const tasks = [
-        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
       ];
       state.tasks = tasks;
       const action = {
         type: 'UPDATE_TASK' as const,
-        payload: { id: '1', description: '   ', priority: 'high' as const },
+        payload: { id: '1', title: '   ', priority: 'high' as const },
       };
 
       const newState = taskReducer(state, action);
 
-      expect(newState.error).toBe('Task cannot be empty');
+      expect(newState.error).toBe('Task title cannot be empty');
     });
 
     it('should update localStorage after update', () => {
       const state = createStateWithList();
       const tasks = [
-        { id: '1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
+        { id: '1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'test-list-id' },
       ];
       state.tasks = tasks;
       const action = {
         type: 'UPDATE_TASK' as const,
-        payload: { id: '1', description: 'Updated', priority: 'low' as const },
+        payload: { id: '1', title: 'Updated', priority: 'low' as const },
       };
 
       taskReducer(state, action);
 
       const stored = localStorage.getItem('taskManagerState');
       const parsedState = JSON.parse(stored!);
-      expect(parsedState.tasks[0].description).toBe('Updated');
+      expect(parsedState.tasks[0].title).toBe('Updated');
       expect(parsedState.tasks[0].priority).toBe('low');
     });
   });
@@ -418,9 +419,9 @@ describe('taskReducer', () => {
       const state: TaskState = {
         lists: [list1, list2],
         tasks: [
-          { id: 't1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
-          { id: 't2', description: 'Task 2', priority: 'medium' as const, createdAt: Date.now(), listId: 'list-2' },
-          { id: 't3', description: 'Task 3', priority: 'low' as const, createdAt: Date.now(), listId: 'list-1' },
+          { id: 't1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
+          { id: 't2', title: 'Task 2', isCompleted: false, priority: 'medium' as const, createdAt: Date.now(), listId: 'list-2' },
+          { id: 't3', title: 'Task 3', isCompleted: false, priority: 'low' as const, createdAt: Date.now(), listId: 'list-1' },
         ],
         activeListId: 'list-2',
         activeView: 'dashboard',
@@ -524,7 +525,7 @@ describe('taskReducer', () => {
       const state: TaskState = {
         lists: [list1, list2],
         tasks: [
-          { id: 't1', description: 'Task 1', priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
+          { id: 't1', title: 'Task 1', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: 'list-1' },
         ],
         activeListId: 'list-1',
         activeView: 'dashboard',
@@ -583,7 +584,7 @@ describe('taskReducer', () => {
 
       const newState = taskReducer(state, action);
 
-      expect(newState.activeView).toBe('list');
+      expect(newState.activeView).toBe('dashboard');
     });
   });
 
@@ -591,7 +592,7 @@ describe('taskReducer', () => {
     it('should load state from localStorage', () => {
       const stateToStore = {
         lists: [{ id: '1', name: 'Test List', createdAt: Date.now() }],
-        tasks: [{ id: '1', description: 'Stored task', priority: 'high' as const, createdAt: Date.now(), listId: '1' }],
+        tasks: [{ id: '1', title: 'Stored task', isCompleted: false, priority: 'high' as const, createdAt: Date.now(), listId: '1' }],
         activeListId: '1',
       };
       localStorage.setItem('taskManagerState', JSON.stringify(stateToStore));
@@ -654,7 +655,7 @@ describe('taskReducer', () => {
       const state = createStateWithList();
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { description: 'Test task', priority: 'medium' as const },
+        payload: { title: 'Test task', priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);

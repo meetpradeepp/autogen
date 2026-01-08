@@ -45,16 +45,34 @@ function generateId(): string {
 }
 
 /**
- * Validate task description
+ * Validate task title
  * @throws Error if validation fails
  */
-function validateTaskDescription(description: string): string {
+function validateTaskTitle(title: string): string {
+  const trimmed = title.trim();
+  if (trimmed.length === 0) {
+    throw new Error('Task title cannot be empty');
+  }
+  if (trimmed.length > 200) {
+    throw new Error('Task title too long (max 200 characters)');
+  }
+  return trimmed;
+}
+
+/**
+ * Validate task description (optional)
+ * @throws Error if validation fails
+ */
+function validateTaskDescription(description: string | undefined): string | undefined {
+  if (!description) {
+    return undefined;
+  }
   const trimmed = description.trim();
   if (trimmed.length === 0) {
-    throw new Error('Task cannot be empty');
+    return undefined; // Empty description is treated as no description
   }
-  if (trimmed.length > 500) {
-    throw new Error('Task description too long (max 500 characters)');
+  if (trimmed.length > 2000) {
+    throw new Error('Task description too long (max 2000 characters)');
   }
   return trimmed;
 }
@@ -71,6 +89,38 @@ function saveState(state: TaskState): void {
     console.warn('Failed to save state to localStorage:', error);
     // Graceful degradation - app continues in memory-only mode
   }
+}
+
+/**
+ * Migrate a task from old format to new format
+ * Handles both 'text' (pre-FE-101) and 'description' (FE-101) to 'title' migration
+ */
+function migrateTask(task: any): Task {
+  // If task already has title, it's in the new format - keep both title and description
+  if (task.title) {
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description || undefined,
+      isCompleted: task.isCompleted ?? false,
+      priority: task.priority,
+      createdAt: task.createdAt,
+      listId: task.listId,
+      dueDate: task.dueDate,
+    };
+  }
+  
+  // Legacy migration: old 'description' or 'text' becomes new 'title'
+  return {
+    id: task.id,
+    title: task.description || task.text || 'Untitled',
+    description: undefined, // Legacy tasks don't have separate description
+    isCompleted: task.isCompleted ?? false,
+    priority: task.priority,
+    createdAt: task.createdAt,
+    listId: task.listId,
+    dueDate: task.dueDate,
+  };
 }
 
 /**
@@ -99,9 +149,12 @@ export function loadState(): TaskState {
         color: list.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length],
       }));
       
+      // Migrate tasks to new format (handles title/description/isCompleted migration)
+      const migratedTasks = (parsed.tasks || []).map(migrateTask);
+      
       return {
         lists: migratedLists,
-        tasks: parsed.tasks || [],
+        tasks: migratedTasks,
         activeListId: parsed.activeListId || null,
         activeView: migrateActiveView(parsed.activeView),
         error: null,
@@ -127,9 +180,14 @@ export function loadState(): TaskState {
         createdAt: Date.now(),
       };
 
-      // Migrate tasks to new format with listId
+      // Migrate tasks to new format with listId and new schema
       const migratedTasks: Task[] = legacyTasks.map(task => ({
-        ...task,
+        id: task.id,
+        title: task.description, // Old 'description' becomes 'title'
+        description: undefined,
+        isCompleted: false,
+        priority: task.priority,
+        createdAt: task.createdAt,
         listId: defaultList.id,
       }));
 
@@ -189,10 +247,13 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           };
         }
 
+        const validatedTitle = validateTaskTitle(action.payload.title);
         const validatedDescription = validateTaskDescription(action.payload.description);
         const newTask: Task = {
           id: generateId(),
+          title: validatedTitle,
           description: validatedDescription,
+          isCompleted: action.payload.isCompleted ?? false,
           priority: action.payload.priority,
           createdAt: Date.now(),
           listId: targetListId,
@@ -216,7 +277,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
 
     case 'UPDATE_TASK': {
       try {
-        const { id, description, priority, dueDate, listId } = action.payload;
+        const { id, title, description, priority, dueDate, listId, isCompleted } = action.payload;
         
         // Validate task exists
         const taskExists = state.tasks.find(task => task.id === id);
@@ -227,7 +288,10 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           };
         }
 
-        // Validate description
+        // Validate title
+        const validatedTitle = validateTaskTitle(title);
+        
+        // Validate description (optional)
         const validatedDescription = validateTaskDescription(description);
         
         // Validate dueDate timestamp
@@ -254,10 +318,12 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           task.id === id
             ? {
                 ...task,
+                title: validatedTitle,
                 description: validatedDescription,
                 priority,
                 dueDate: validatedDueDate,
                 ...(listId !== undefined && { listId }),
+                ...(isCompleted !== undefined && { isCompleted }),
               }
             : task
         );
@@ -275,6 +341,20 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
           error: error instanceof Error ? error.message : 'Failed to update task',
         };
       }
+    }
+
+    case 'TOGGLE_TASK_COMPLETION': {
+      const updatedTasks = state.tasks.map(task =>
+        task.id === action.payload
+          ? { ...task, isCompleted: !task.isCompleted }
+          : task
+      );
+      const newState = {
+        ...state,
+        tasks: updatedTasks,
+      };
+      saveState(newState);
+      return newState;
     }
 
     case 'DELETE_TASK': {

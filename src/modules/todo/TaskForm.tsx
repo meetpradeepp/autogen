@@ -7,6 +7,7 @@ import styles from './TaskForm.module.css';
 export function TaskForm() {
   const { state, dispatch } = useTaskContext();
   const { showToast } = useToast();
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [dueDate, setDueDate] = useState('');
@@ -16,10 +17,11 @@ export function TaskForm() {
   useEffect(() => {
     if (state.tasks.length > previousTaskCountRef.current && !state.error && state.tasks.length > 0) {
       const newTask = state.tasks[0]; // New tasks are prepended
-      const truncatedDesc = newTask.description.length > 50 
-        ? newTask.description.substring(0, 50) + '...' 
-        : newTask.description;
-      showToast(`Task '${truncatedDesc}' added`);
+      const truncatedTitle = newTask.title.length > 50 
+        ? newTask.title.substring(0, 50) + '...' 
+        : newTask.title;
+      showToast(`Task '${truncatedTitle}' added`);
+      setTitle('');
       setDescription('');
       setPriority('medium');
       setDueDate('');
@@ -41,19 +43,24 @@ export function TaskForm() {
     dispatch({
       type: 'ADD_TASK',
       payload: {
-        description,
+        title,
+        description: description || undefined,
         priority,
         dueDate: dueDateTimestamp,
       },
     });
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(e.target.value);
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
     // Clear error when user starts typing
     if (state.error) {
       dispatch({ type: 'CLEAR_ERROR' });
     }
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
   };
 
   // State Guard: Only render TaskForm when an active list is selected
@@ -78,11 +85,21 @@ export function TaskForm() {
       <div className={styles.inputGroup}>
         <input
           type="text"
+          value={title}
+          onChange={handleTitleChange}
+          placeholder="Task title (required)..."
+          className={styles.input}
+          aria-label="Task title"
+          required
+        />
+        
+        <textarea
           value={description}
           onChange={handleDescriptionChange}
-          placeholder="Enter task description..."
-          className={styles.input}
+          placeholder="Description (optional)..."
+          className={styles.textarea}
           aria-label="Task description"
+          rows={2}
         />
         
         <select

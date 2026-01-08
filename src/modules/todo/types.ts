@@ -4,7 +4,9 @@ export type SortOption = 'priority' | 'dateAdded' | 'alphabetical';
 
 export interface Task {
   id: string;
-  description: string;
+  title: string; // Short summary (was 'description')
+  description?: string; // Optional detailed instructions
+  isCompleted: boolean; // Task completion status
   priority: Priority;
   createdAt: number;
   listId: string; // Reference to the list this task belongs to
@@ -30,8 +32,9 @@ export interface TaskState {
 }
 
 export type TaskAction =
-  | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId'> & { listId?: string } }
-  | { type: 'UPDATE_TASK'; payload: { id: string; description: string; priority: Priority; dueDate?: number; listId?: string } }
+  | { type: 'ADD_TASK'; payload: Omit<Task, 'id' | 'createdAt' | 'listId' | 'isCompleted'> & { listId?: string; isCompleted?: boolean } }
+  | { type: 'UPDATE_TASK'; payload: { id: string; title: string; description?: string; priority: Priority; dueDate?: number; listId?: string; isCompleted?: boolean } }
+  | { type: 'TOGGLE_TASK_COMPLETION'; payload: string }
   | { type: 'DELETE_TASK'; payload: string }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'CLEAR_ERROR' }

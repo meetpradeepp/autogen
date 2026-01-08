@@ -30,12 +30,13 @@ describe('ProductivityDashboard', () => {
 
   const createTask = (
     id: string,
-    description: string,
+    title: string,
     createdAt: number,
     dueDate?: number
   ): Task => ({
     id,
-    description,
+    title,
+    isCompleted: false,
     priority: 'medium',
     createdAt,
     listId: 'list-1',
