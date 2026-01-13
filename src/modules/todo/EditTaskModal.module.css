@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,9 +22,9 @@
 }
 
 .modal {
-  background: white;
+  background: var(--modal-bg);
   border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
@@ -46,7 +46,7 @@
 
 .header {
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -56,14 +56,14 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .closeButton {
   background: transparent;
   border: none;
   font-size: 1.5rem;
-  color: #718096;
+  color: var(--text-tertiary);
   cursor: pointer;
   padding: 0;
   width: 2rem;
@@ -76,8 +76,8 @@
 }
 
 .closeButton:hover {
-  background: #f7fafc;
-  color: #2d3748;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .form {
@@ -97,37 +97,41 @@
 .label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 .required {
-  color: #e53e3e;
+  color: var(--color-danger);
 }
 
 .input,
 .select {
   padding: 0.75rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-secondary);
   border-radius: 6px;
   font-size: 1rem;
   transition: all 0.2s;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .textarea {
   padding: 0.75rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-secondary);
   border-radius: 6px;
   font-size: 1rem;
   font-family: inherit;
   resize: vertical;
   min-height: 100px;
   transition: all 0.2s;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .textarea:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--border-focus);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .statusToggle {
@@ -143,54 +147,54 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .toggleButton.pending {
-  border-color: #cbd5e0;
-  color: #4a5568;
+  border-color: var(--border-secondary);
+  color: var(--text-secondary);
 }
 
 .toggleButton.pending:hover {
-  border-color: #4a90e2;
-  color: #4a90e2;
-  background: #f0f7ff;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--badge-low-bg);
 }
 
 .toggleButton.completed {
-  border-color: #48bb78;
-  color: #48bb78;
-  background: #f0fff4;
+  border-color: var(--color-success);
+  color: var(--color-success);
+  background: var(--bg-secondary);
 }
 
 .toggleButton.completed:hover {
-  border-color: #38a169;
-  color: #38a169;
-  background: #c6f6d5;
+  border-color: var(--color-success-hover);
+  color: var(--color-success-hover);
+  background: var(--bg-tertiary);
 }
 
 .readOnlyField {
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-primary);
   border-radius: 6px;
   font-size: 1rem;
-  background: #f7fafc;
-  color: #4a5568;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--border-focus);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .error {
   padding: 0.75rem;
-  background: #fee;
-  color: #c53030;
-  border: 1px solid #fc8181;
+  background: var(--badge-high-bg);
+  color: var(--badge-high-text);
+  border: 1px solid var(--badge-high-border);
   border-radius: 6px;
   font-size: 0.9rem;
 }
@@ -214,22 +218,22 @@
 }
 
 .cancelButton {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-secondary);
 }
 
 .cancelButton:hover {
-  background: #edf2f7;
+  background: var(--bg-tertiary);
 }
 
 .submitButton {
-  background: #4a90e2;
-  color: white;
+  background: var(--color-primary);
+  color: var(--text-on-gradient);
 }
 
 .submitButton:hover {
-  background: #357abd;
+  background: var(--color-primary-hover);
 }
 
 .submitButton:active {

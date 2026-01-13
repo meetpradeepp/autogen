@@ -111,7 +111,7 @@ describe('taskReducer', () => {
       const longTitle = 'a'.repeat(201);
       const action = {
         type: 'ADD_TASK' as const,
-        payload: { title: longDescription, priority: 'medium' as const },
+        payload: { title: longTitle, priority: 'medium' as const },
       };
 
       const newState = taskReducer(state, action);
