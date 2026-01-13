@@ -17,7 +17,7 @@ export function Sidebar() {
 
   // Determine active view from URL
   const isCalendarView = location.pathname === '/calendar';
-  const isDashboardView = location.pathname === '/' || location.pathname.startsWith('/list/');
+  const isDashboardView = location.pathname === '/';
   
   // Extract active list ID from URL (source of truth)
   const activeListIdFromUrl = location.pathname.startsWith('/list/') 
