@@ -1,15 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TaskProvider } from '../../context/TaskContext';
 import { ToastProvider } from '../../context/ToastContext';
 
 // Wrapper component to provide necessary context
-function TestWrapper({ children }: { children: React.ReactNode }) {
+function TestWrapper({ children, initialRoute = '/' }: { children: React.ReactNode; initialRoute?: string }) {
   return (
-    <ToastProvider>
-      <TaskProvider>{children}</TaskProvider>
-    </ToastProvider>
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <ToastProvider>
+        <TaskProvider>{children}</TaskProvider>
+      </ToastProvider>
+    </MemoryRouter>
   );
 }
 
@@ -139,7 +142,7 @@ describe('Sidebar', () => {
       expect(screen.getByRole('button', { name: 'Work' })).toBeInTheDocument();
     });
 
-    it('should switch to dashboard view when clicking a list', () => {
+    it('should NOT show dashboard as active when clicking a list', () => {
       render(
         <TestWrapper>
           <Sidebar />
@@ -165,9 +168,9 @@ describe('Sidebar', () => {
       const listButton = screen.getByRole('button', { name: 'Personal' });
       fireEvent.click(listButton);
 
-      // Should be back in dashboard view
+      // Dashboard should NOT be active when viewing a list
       const dashboardButton = screen.getByRole('button', { name: '📊 Dashboard' });
-      expect(dashboardButton.className).toContain('active');
+      expect(dashboardButton.className).not.toContain('active');
       expect(calendarButton.className).not.toContain('active');
     });
 
