@@ -3,13 +3,16 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Header } from './Header';
 import { CompactModeProvider } from '../../context/CompactModeContext';
+import { ThemeProvider } from '../../context/ThemeContext';
 
 function renderHeader(initialRoute: string = '/') {
   return render(
     <MemoryRouter initialEntries={[initialRoute]}>
-      <CompactModeProvider>
-        <Header />
-      </CompactModeProvider>
+      <ThemeProvider>
+        <CompactModeProvider>
+          <Header />
+        </CompactModeProvider>
+      </ThemeProvider>
     </MemoryRouter>
   );
 }

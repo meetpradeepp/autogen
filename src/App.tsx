@@ -2,12 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate, useParams, useNavigate } from '
 import { useEffect } from 'react';
 import { TaskProvider } from './context/TaskContext';
 import { CompactModeProvider } from './context/CompactModeContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { TaskForm } from './modules/todo/TaskForm';
 import { TaskList } from './modules/todo/TaskList';
 import { CalendarView } from './modules/todo/CalendarView';
 import { ProductivityDashboard } from './modules/todo/ProductivityDashboard';
 import { Layout } from './modules/todo/Layout';
 import { useTaskContext } from './context/TaskContext';
+import './variables.css';
 import './App.css';
 
 /**
@@ -100,13 +102,15 @@ function AppContent() {
 
 function App() {
   return (
-    <CompactModeProvider>
-      <TaskProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TaskProvider>
-    </CompactModeProvider>
+    <ThemeProvider>
+      <CompactModeProvider>
+        <TaskProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </TaskProvider>
+      </CompactModeProvider>
+    </ThemeProvider>
   );
 }
 

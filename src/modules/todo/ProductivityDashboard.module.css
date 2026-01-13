@@ -2,7 +2,7 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  background: #f8f9fa;
+  background: var(--calendar-bg);
   min-height: 100%;
 }
 
@@ -10,7 +10,7 @@
   margin: 0 0 2rem 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-primary);
   text-align: center;
 }
 
@@ -22,17 +22,17 @@
 }
 
 .widget {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .widget:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .widgetIcon {
@@ -43,13 +43,13 @@
 .widgetValue {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .widgetLabel {
   font-size: 1rem;
-  color: #718096;
+  color: var(--text-tertiary);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -59,9 +59,9 @@
 .emptyState {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   max-width: 600px;
   margin: 4rem auto;
 }
@@ -69,20 +69,20 @@
 .emptyTitle {
   font-size: 2rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-primary);
   margin: 0 0 1rem 0;
 }
 
 .emptyDescription {
   font-size: 1.25rem;
-  color: #4a5568;
+  color: var(--text-secondary);
   margin: 0 0 1rem 0;
   line-height: 1.6;
 }
 
 .emptyHint {
   font-size: 1rem;
-  color: #718096;
+  color: var(--text-tertiary);
   margin: 0;
   line-height: 1.6;
 }

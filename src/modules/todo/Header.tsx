@@ -1,9 +1,11 @@
 import { useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 import { useCompactMode } from '../../context/CompactModeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export function Header() {
   const { compactMode, toggleCompactMode } = useCompactMode();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   
   // Only show compact mode toggle on Task List views
@@ -15,8 +17,16 @@ export function Header() {
         <div className={styles.logoIcon}>✓</div>
         <h1 className={styles.title}>Task Manager</h1>
       </div>
-      {isListView && (
-        <div className={styles.controls}>
+      <div className={styles.controls}>
+        <button
+          onClick={toggleTheme}
+          className={styles.themeToggle}
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+        {isListView && (
           <label className={styles.toggleLabel}>
             <input
               type="checkbox"
@@ -27,8 +37,8 @@ export function Header() {
             />
             <span className={styles.toggleText}>Compact View</span>
           </label>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }
