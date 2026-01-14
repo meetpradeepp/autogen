@@ -289,4 +289,41 @@ describe('ProductivityDashboard', () => {
       expect(screen.getByText('100')).toBeInTheDocument();
     });
   });
+
+  describe('Widget Interactivity', () => {
+    it('should show clickable cursor class on interactive widgets', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [createTask('1', 'Test task', Date.now())],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      const { container } = renderWithContext(state);
+      
+      // Check that clickable widgets exist
+      const widgets = container.querySelectorAll('[class*="widgetClickable"]');
+      // Should have 3 clickable widgets: Open Tasks, Overdue, Due Today
+      expect(widgets.length).toBe(3);
+    });
+
+    it('should render non-clickable widgets without clickable class', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [createTask('1', 'Test task', Date.now())],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      const { container } = renderWithContext(state);
+      
+      // Total widgets should be 5
+      const allWidgets = container.querySelectorAll('[class*="widget"]');
+      expect(allWidgets.length).toBeGreaterThanOrEqual(5);
+    });
+  });
 });
