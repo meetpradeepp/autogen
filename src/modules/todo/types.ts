@@ -45,4 +45,5 @@ export type TaskAction =
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'LOAD_STATE'; payload: TaskState }
   | { type: 'SET_SORT_PREFERENCE'; payload: { listId: string; sortOption: SortOption } }
-  | { type: 'SET_VIEW'; payload: ViewMode };
+  | { type: 'SET_VIEW'; payload: ViewMode }
+  | { type: 'REORDER_LISTS'; payload: { oldIndex: number; newIndex: number } };

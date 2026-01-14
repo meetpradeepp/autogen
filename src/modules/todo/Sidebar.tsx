@@ -4,6 +4,89 @@ import { useTaskContext } from '../../context/TaskContext';
 import { useToast } from '../../context/ToastContext';
 import { DEFAULT_COLORS } from './reducer';
 import styles from './Sidebar.module.css';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+interface SortableListItemProps {
+  id: string;
+  name: string;
+  color: string;
+  isActive: boolean;
+  onSwitch: (id: string) => void;
+  onDelete: (id: string, name: string, e: React.MouseEvent) => void;
+}
+
+function SortableListItem({ id, name, color, isActive, onSwitch, onDelete }: SortableListItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${styles.listItem} ${isActive ? styles.active : ''} ${isDragging ? styles.dragging : ''}`}
+    >
+      <button
+        onClick={() => onSwitch(id)}
+        className={styles.listButton}
+        {...attributes}
+        {...listeners}
+      >
+        <span 
+          className={styles.colorDot} 
+          style={{ backgroundColor: color }}
+          aria-hidden="true"
+        />
+        {name}
+      </button>
+      <button
+        onClick={(e) => onDelete(id, name, e)}
+        className={styles.deleteButton}
+        aria-label={`Delete ${name}`}
+        title="Delete list"
+      >
+        <svg 
+          width="14" 
+          height="14" 
+          viewBox="0 0 16 16" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path 
+            d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+    </div>
+  );
+}
 
 export function Sidebar() {
   const { state, dispatch } = useTaskContext();
@@ -14,6 +97,14 @@ export function Sidebar() {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLORS[0]);
   const [isCreating, setIsCreating] = useState(false);
   const previousListCountRef = useRef(state.lists.length);
+
+  // Configure drag sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Determine active view from URL
   const isCalendarView = location.pathname === '/calendar';
@@ -91,6 +182,20 @@ export function Sidebar() {
     }
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = state.lists.findIndex((list) => list.id === active.id);
+      const newIndex = state.lists.findIndex((list) => list.id === over.id);
+
+      dispatch({
+        type: 'REORDER_LISTS',
+        payload: { oldIndex, newIndex },
+      });
+    }
+  };
+
   return (
     <aside className={styles.sidebar}>
       {/* Views Section */}
@@ -125,45 +230,28 @@ export function Sidebar() {
           {state.lists.length === 0 ? (
             <div className={styles.emptyState}>No lists yet</div>
           ) : (
-            state.lists.map((list) => (
-              <div
-                key={list.id}
-                className={`${styles.listItem} ${
-                  activeListIdFromUrl === list.id ? styles.active : ''
-                }`}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={state.lists.map((list) => list.id)}
+                strategy={verticalListSortingStrategy}
               >
-                <button
-                  onClick={() => handleSwitchList(list.id)}
-                  className={styles.listButton}
-                >
-                  <span 
-                    className={styles.colorDot} 
-                    style={{ backgroundColor: list.color }}
-                    aria-hidden="true"
+                {state.lists.map((list) => (
+                  <SortableListItem
+                    key={list.id}
+                    id={list.id}
+                    name={list.name}
+                    color={list.color}
+                    isActive={activeListIdFromUrl === list.id}
+                    onSwitch={handleSwitchList}
+                    onDelete={handleDeleteList}
                   />
-                  {list.name}
-                </button>
-                <button
-                  onClick={(e) => handleDeleteList(list.id, list.name, e)}
-                  className={styles.deleteButton}
-                  aria-label={`Delete ${list.name}`}
-                  title="Delete list"
-                >
-                  <svg 
-                    width="14" 
-                    height="14" 
-                    viewBox="0 0 16 16" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      d="M6 2V1h4v1h3v1H3V2h3zM4 4h8v10H4V4zm2 2v6h1V6H6zm3 0v6h1V6H9z" 
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
         </nav>
 

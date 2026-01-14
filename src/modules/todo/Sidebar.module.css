@@ -88,6 +88,15 @@
   background: var(--bg-active);
 }
 
+.listItem.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.listItem {
+  cursor: grab;
+}
+
 .listButton {
   flex: 1;
   padding: 0.5rem;
