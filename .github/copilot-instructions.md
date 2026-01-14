@@ -248,7 +248,7 @@ Then the change **must be explicitly documented**, including:
 
 ## 🛡️ GATE 4: Security Self-Audit
 
-Perform adversarial review.
+Perform adversarial review. Use #runSubAgent to run security_analyst subagent
 
 ### Output
 - Security Audit Report: PASS / FAIL
