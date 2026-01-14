@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatCreatedDate, formatTaskAge, formatDueDate, normalizeToStartOfDay, isTaskOverdue, isTaskDueToday, isTaskDueFuture } from './utils';
+import { formatCreatedDate, formatTaskAge, formatDueDate, normalizeToStartOfDay, isTaskOverdue, isTaskDueToday, isTaskDueFuture, isSameMonth } from './utils';
 
 describe('formatCreatedDate', () => {
   it('should format timestamp as "DD MMM"', () => {
@@ -255,5 +255,49 @@ describe('isTaskDueFuture', () => {
   it('should return true for tasks due multiple days in the future', () => {
     const futureDate = new Date('2026-01-20T15:00:00.000').getTime();
     expect(isTaskDueFuture(futureDate)).toBe(true);
+  });
+});
+
+describe('isSameMonth', () => {
+  it('should return true for dates in the same month and year', () => {
+    const date1 = new Date('2026-01-15');
+    const date2 = new Date('2026-01-20');
+    expect(isSameMonth(date1, date2)).toBe(true);
+  });
+
+  it('should return true for the same exact date', () => {
+    const date1 = new Date('2026-01-15');
+    const date2 = new Date('2026-01-15');
+    expect(isSameMonth(date1, date2)).toBe(true);
+  });
+
+  it('should return false for different months in the same year', () => {
+    const date1 = new Date('2026-01-15');
+    const date2 = new Date('2026-02-15');
+    expect(isSameMonth(date1, date2)).toBe(false);
+  });
+
+  it('should return false for same month in different years', () => {
+    const date1 = new Date('2026-01-15');
+    const date2 = new Date('2027-01-15');
+    expect(isSameMonth(date1, date2)).toBe(false);
+  });
+
+  it('should return false for different months and years', () => {
+    const date1 = new Date('2026-01-15');
+    const date2 = new Date('2027-02-15');
+    expect(isSameMonth(date1, date2)).toBe(false);
+  });
+
+  it('should handle beginning and end of same month', () => {
+    const date1 = new Date('2026-01-01');
+    const date2 = new Date('2026-01-31');
+    expect(isSameMonth(date1, date2)).toBe(true);
+  });
+
+  it('should handle year boundary - Dec 2025 vs Jan 2026', () => {
+    const date1 = new Date('2025-12-31');
+    const date2 = new Date('2026-01-01');
+    expect(isSameMonth(date1, date2)).toBe(false);
   });
 });

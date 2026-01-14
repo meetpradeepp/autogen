@@ -37,11 +37,18 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, opacity 0.2s;
 }
 
-.todayButton:hover {
+.todayButton:hover:not(:disabled) {
   background: var(--color-primary-hover);
+}
+
+.todayButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .navButton {
