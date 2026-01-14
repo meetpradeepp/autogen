@@ -117,6 +117,27 @@ describe('ProductivityDashboard', () => {
       expect(widgets.length).toBeGreaterThan(0);
     });
 
+    it('should exclude completed tasks from open tasks count', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [
+          createTask('1', 'Task 1', Date.now()),
+          createTask('2', 'Task 2', Date.now()),
+          { ...createTask('3', 'Task 3', Date.now()), isCompleted: true },
+        ],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      renderWithContext(state);
+      
+      // Should show 2 open tasks (excluding completed)
+      const widgets = screen.getAllByText('2');
+      expect(widgets.length).toBeGreaterThan(0);
+    });
+
     it('should count overdue tasks correctly', () => {
       const now = Date.now();
       const yesterday = now - 24 * 60 * 60 * 1000;

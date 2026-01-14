@@ -3,6 +3,8 @@ import { useTaskContext } from '../../context/TaskContext';
 import { Task, TodoList } from './types';
 import styles from './TaskSummaryModal.module.css';
 
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+
 interface TaskSummaryModalProps {
   title: string;
   filterType: 'open' | 'overdue' | 'dueToday';
@@ -16,19 +18,18 @@ export function TaskSummaryModal({ title, filterType, onClose, onTaskClick }: Ta
   // Filter tasks based on type - calculated on click per requirements
   const filteredTasks = useMemo(() => {
     const now = Date.now();
-    const oneDayMs = 24 * 60 * 60 * 1000;
 
     switch (filterType) {
       case 'overdue':
-        return state.tasks.filter(task => task.dueDate && task.dueDate < now);
+        return state.tasks.filter(task => !task.isCompleted && task.dueDate && task.dueDate < now);
       case 'dueToday':
         return state.tasks.filter(task => {
-          if (!task.dueDate) return false;
-          return task.dueDate >= now && task.dueDate < now + oneDayMs;
+          if (task.isCompleted || !task.dueDate) return false;
+          return task.dueDate >= now && task.dueDate < now + MILLISECONDS_PER_DAY;
         });
       case 'open':
       default:
-        return state.tasks;
+        return state.tasks.filter(task => !task.isCompleted);
     }
   }, [state.tasks, filterType]);
 
@@ -65,7 +66,7 @@ export function TaskSummaryModal({ title, filterType, onClose, onTaskClick }: Ta
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = timestamp - now.getTime();
-    const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+    const diffDays = Math.floor(diffMs / MILLISECONDS_PER_DAY);
 
     if (diffDays === 0) {
       return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;

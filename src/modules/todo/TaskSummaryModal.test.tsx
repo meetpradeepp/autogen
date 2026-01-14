@@ -52,12 +52,13 @@ describe('TaskSummaryModal', () => {
     id: string,
     title: string,
     listId: string,
-    dueDate?: number
+    dueDate?: number,
+    priority: 'high' | 'medium' | 'low' = 'medium'
   ): Task => ({
     id,
     title,
     isCompleted: false,
-    priority: 'medium',
+    priority,
     createdAt: Date.now(),
     listId,
     ...(dueDate && { dueDate }),
@@ -87,6 +88,28 @@ describe('TaskSummaryModal', () => {
       expect(screen.getByText('Overdue task')).toBeInTheDocument();
       expect(screen.queryByText('Future task')).not.toBeInTheDocument();
       expect(screen.queryByText('No due date')).not.toBeInTheDocument();
+    });
+
+    it('should exclude completed tasks from overdue', () => {
+      const now = Date.now();
+      const yesterday = now - 24 * 60 * 60 * 1000;
+
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [
+          createTask('1', 'Overdue incomplete', 'list-1', yesterday),
+          { ...createTask('2', 'Overdue completed', 'list-1', yesterday), isCompleted: true },
+        ],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      renderModal(state, 'overdue', 'Overdue Tasks');
+
+      expect(screen.getByText('Overdue incomplete')).toBeInTheDocument();
+      expect(screen.queryByText('Overdue completed')).not.toBeInTheDocument();
     });
 
     it('should show empty state when no overdue tasks', () => {
@@ -131,7 +154,7 @@ describe('TaskSummaryModal', () => {
   });
 
   describe('Open Tasks Filter', () => {
-    it('should display all tasks', () => {
+    it('should display all incomplete tasks', () => {
       const state: TaskState = {
         lists: [testList],
         tasks: [
@@ -150,6 +173,25 @@ describe('TaskSummaryModal', () => {
       expect(screen.getByText('Task 1')).toBeInTheDocument();
       expect(screen.getByText('Task 2')).toBeInTheDocument();
       expect(screen.getByText('Task 3')).toBeInTheDocument();
+    });
+
+    it('should exclude completed tasks from open tasks', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [
+          createTask('1', 'Incomplete task', 'list-1'),
+          { ...createTask('2', 'Completed task', 'list-1'), isCompleted: true },
+        ],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      renderModal(state, 'open', 'Open Tasks');
+
+      expect(screen.getByText('Incomplete task')).toBeInTheDocument();
+      expect(screen.queryByText('Completed task')).not.toBeInTheDocument();
     });
   });
 

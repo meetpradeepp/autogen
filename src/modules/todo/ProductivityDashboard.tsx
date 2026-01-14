@@ -26,17 +26,17 @@ export function ProductivityDashboard() {
     const now = Date.now();
     const oneDayMs = 24 * 60 * 60 * 1000;
 
-    // Open Tasks: count all tasks (system deletes completed tasks, so all existing tasks are open)
-    const openTasks = state.tasks.length;
+    // Open Tasks: count all incomplete tasks
+    const openTasks = state.tasks.filter(task => !task.isCompleted).length;
 
-    // Overdue: tasks with dueDate < now
+    // Overdue: incomplete tasks with dueDate < now
     const overdueTasks = state.tasks.filter(
-      task => task.dueDate && task.dueDate < now
+      task => !task.isCompleted && task.dueDate && task.dueDate < now
     ).length;
 
     // Due Today: tasks due within the next 24 hours
     const dueTodayTasks = state.tasks.filter(task => {
-      if (!task.dueDate) return false;
+      if (task.isCompleted || !task.dueDate) return false;
       return task.dueDate >= now && task.dueDate < now + oneDayMs;
     }).length;
 
