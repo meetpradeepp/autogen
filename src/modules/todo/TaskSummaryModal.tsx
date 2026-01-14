@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { Task, TodoList } from './types';
+import { isTaskOverdue, isTaskDueToday, normalizeToStartOfDay } from './utils';
 import styles from './TaskSummaryModal.module.css';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -21,11 +22,11 @@ export function TaskSummaryModal({ title, filterType, onClose, onTaskClick }: Ta
 
     switch (filterType) {
       case 'overdue':
-        return state.tasks.filter(task => !task.isCompleted && task.dueDate && task.dueDate < now);
+        return state.tasks.filter(task => !task.isCompleted && task.dueDate && isTaskOverdue(task.dueDate, now));
       case 'dueToday':
         return state.tasks.filter(task => {
           if (task.isCompleted || !task.dueDate) return false;
-          return task.dueDate >= now && task.dueDate < now + MILLISECONDS_PER_DAY;
+          return isTaskDueToday(task.dueDate, now);
         });
       case 'open':
       default:
@@ -65,7 +66,11 @@ export function TaskSummaryModal({ title, filterType, onClose, onTaskClick }: Ta
   const formatDueDate = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffMs = timestamp - now.getTime();
+    
+    // Normalize dates to compare only the calendar date, not time
+    const dueDateNormalized = normalizeToStartOfDay(timestamp);
+    const todayNormalized = normalizeToStartOfDay(now.getTime());
+    const diffMs = dueDateNormalized - todayNormalized;
     const diffDays = Math.floor(diffMs / MILLISECONDS_PER_DAY);
 
     if (diffDays === 0) {
@@ -114,7 +119,7 @@ export function TaskSummaryModal({ title, filterType, onClose, onTaskClick }: Ta
                 </h3>
                 <ul className={styles.taskList}>
                   {tasks.map(task => {
-                    const isOverdue = task.dueDate && task.dueDate < Date.now();
+                    const isOverdue = task.dueDate && isTaskOverdue(task.dueDate);
                     return (
                       <li
                         key={task.id}
