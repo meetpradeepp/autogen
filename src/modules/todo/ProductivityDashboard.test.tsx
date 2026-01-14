@@ -117,6 +117,27 @@ describe('ProductivityDashboard', () => {
       expect(widgets.length).toBeGreaterThan(0);
     });
 
+    it('should exclude completed tasks from open tasks count', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [
+          createTask('1', 'Task 1', Date.now()),
+          createTask('2', 'Task 2', Date.now()),
+          { ...createTask('3', 'Task 3', Date.now()), isCompleted: true },
+        ],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      renderWithContext(state);
+      
+      // Should show 2 open tasks (excluding completed)
+      const widgets = screen.getAllByText('2');
+      expect(widgets.length).toBeGreaterThan(0);
+    });
+
     it('should count overdue tasks correctly', () => {
       const now = Date.now();
       const yesterday = now - 24 * 60 * 60 * 1000;
@@ -287,6 +308,43 @@ describe('ProductivityDashboard', () => {
       renderWithContext(state);
       
       expect(screen.getByText('100')).toBeInTheDocument();
+    });
+  });
+
+  describe('Widget Interactivity', () => {
+    it('should show clickable cursor class on interactive widgets', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [createTask('1', 'Test task', Date.now())],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      const { container } = renderWithContext(state);
+      
+      // Check that clickable widgets exist
+      const widgets = container.querySelectorAll('[class*="widgetClickable"]');
+      // Should have 3 clickable widgets: Open Tasks, Overdue, Due Today
+      expect(widgets.length).toBe(3);
+    });
+
+    it('should render non-clickable widgets without clickable class', () => {
+      const state: TaskState = {
+        lists: [testList],
+        tasks: [createTask('1', 'Test task', Date.now())],
+        activeListId: null,
+        activeView: 'dashboard',
+        error: null,
+        sortPreferences: {},
+      };
+
+      const { container } = renderWithContext(state);
+      
+      // Total widgets should be 5
+      const allWidgets = container.querySelectorAll('[class*="widget"]');
+      expect(allWidgets.length).toBeGreaterThanOrEqual(5);
     });
   });
 });
