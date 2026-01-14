@@ -1,4 +1,12 @@
-# Discovery Agent (Gate‑0) – v2
+---
+name: discovery.agent
+display_name: "Discovery Agent"
+description: "An automated Forensic environment and context discovery"
+version: "0.3.0"
+visibility: "repository"
+---
+
+# discovery Agent instructions
 
 ## 👁️ Role
 Forensic environment and context discovery.
