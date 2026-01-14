@@ -29,8 +29,8 @@ export function CalendarView() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [creatingTaskForDate, setCreatingTaskForDate] = useState<number | null>(null);
 
-  // Check if currently viewing the current month
-  const isCurrentMonth = useMemo(() => {
+  // Check if the calendar is currently showing today's month
+  const isViewingCurrentMonth = useMemo(() => {
     return isSameMonth(currentDate, new Date());
   }, [currentDate]);
 
@@ -183,8 +183,8 @@ export function CalendarView() {
           <button 
             onClick={handleToday} 
             className={styles.todayButton}
-            disabled={isCurrentMonth}
-            aria-label={isCurrentMonth ? "Currently viewing current month" : "Return to today"}
+            disabled={isViewingCurrentMonth}
+            aria-label={isViewingCurrentMonth ? "Currently viewing current month" : "Return to today"}
           >
             Today
           </button>
