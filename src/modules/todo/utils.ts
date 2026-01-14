@@ -123,3 +123,15 @@ export function isTaskDueFuture(dueDate: number, now: number = Date.now()): bool
   const todayNormalized = normalizeToStartOfDay(now);
   return dueDateNormalized > todayNormalized;
 }
+
+/**
+ * Check if two dates are in the same month and year
+ * 
+ * @param date1 - First date to compare
+ * @param date2 - Second date to compare
+ * @returns true if both dates are in the same month and year
+ */
+export function isSameMonth(date1: Date, date2: Date): boolean {
+  return date1.getMonth() === date2.getMonth() && 
+         date1.getFullYear() === date2.getFullYear();
+}

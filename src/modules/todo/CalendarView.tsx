@@ -3,7 +3,7 @@ import { useTaskContext } from '../../context/TaskContext';
 import { TaskModal } from './EditTaskModal';
 import { Task } from './types';
 import styles from './CalendarView.module.css';
-import { formatCreatedDate } from './utils';
+import { formatCreatedDate, isSameMonth } from './utils';
 
 interface CalendarDay {
   date: Date;
@@ -28,6 +28,11 @@ export function CalendarView() {
   const [showPopover, setShowPopover] = useState<{ date: string; tasks: Task[] } | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [creatingTaskForDate, setCreatingTaskForDate] = useState<number | null>(null);
+
+  // Check if currently viewing the current month
+  const isCurrentMonth = useMemo(() => {
+    return isSameMonth(currentDate, new Date());
+  }, [currentDate]);
 
   // Generate calendar grid for current month
   const calendarDays = useMemo(() => {
@@ -175,7 +180,12 @@ export function CalendarView() {
       <div className={styles.header}>
         <h2 className={styles.monthYear}>{monthYearFormat.format(currentDate)}</h2>
         <div className={styles.navigation}>
-          <button onClick={handleToday} className={styles.todayButton}>
+          <button 
+            onClick={handleToday} 
+            className={styles.todayButton}
+            disabled={isCurrentMonth}
+            aria-label={isCurrentMonth ? "Currently viewing current month" : "Return to today"}
+          >
             Today
           </button>
           <button onClick={handlePrevMonth} className={styles.navButton}>
