@@ -68,3 +68,58 @@ export function formatTaskAge(createdAt: number): string {
   const ageInWeeks = Math.floor(ageInDays / 7);
   return `${ageInWeeks} ${ageInWeeks === 1 ? 'week' : 'weeks'}`;
 }
+
+/**
+ * Normalize a date to midnight (00:00:00.000) in local time
+ * This strips the time component, keeping only the calendar date
+ * 
+ * @param timestamp - Date timestamp to normalize
+ * @returns Timestamp normalized to midnight
+ */
+export function normalizeToStartOfDay(timestamp: number): number {
+  const date = new Date(timestamp);
+  date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
+/**
+ * Check if a task is overdue based on its due date
+ * A task is overdue if its due date is before today (yesterday or earlier)
+ * 
+ * @param dueDate - Task due date timestamp
+ * @param now - Current timestamp (defaults to Date.now())
+ * @returns true if task is overdue
+ */
+export function isTaskOverdue(dueDate: number, now: number = Date.now()): boolean {
+  const dueDateNormalized = normalizeToStartOfDay(dueDate);
+  const todayNormalized = normalizeToStartOfDay(now);
+  return dueDateNormalized < todayNormalized;
+}
+
+/**
+ * Check if a task is due today
+ * A task is due today if its due date matches today's calendar date
+ * 
+ * @param dueDate - Task due date timestamp
+ * @param now - Current timestamp (defaults to Date.now())
+ * @returns true if task is due today
+ */
+export function isTaskDueToday(dueDate: number, now: number = Date.now()): boolean {
+  const dueDateNormalized = normalizeToStartOfDay(dueDate);
+  const todayNormalized = normalizeToStartOfDay(now);
+  return dueDateNormalized === todayNormalized;
+}
+
+/**
+ * Check if a task is due in the future
+ * A task is due in the future if its due date is after today (tomorrow or later)
+ * 
+ * @param dueDate - Task due date timestamp
+ * @param now - Current timestamp (defaults to Date.now())
+ * @returns true if task is due in the future
+ */
+export function isTaskDueFuture(dueDate: number, now: number = Date.now()): boolean {
+  const dueDateNormalized = normalizeToStartOfDay(dueDate);
+  const todayNormalized = normalizeToStartOfDay(now);
+  return dueDateNormalized > todayNormalized;
+}

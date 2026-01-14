@@ -3,6 +3,7 @@ import { useTaskContext } from '../../context/TaskContext';
 import { TaskSummaryModal } from './TaskSummaryModal';
 import { Task } from './types';
 import { TaskModal } from './EditTaskModal';
+import { isTaskOverdue, isTaskDueToday } from './utils';
 import styles from './ProductivityDashboard.module.css';
 
 interface DashboardMetrics {
@@ -29,15 +30,15 @@ export function ProductivityDashboard() {
     // Open Tasks: count all incomplete tasks
     const openTasks = state.tasks.filter(task => !task.isCompleted).length;
 
-    // Overdue: incomplete tasks with dueDate < now
+    // Overdue: incomplete tasks with due date before today (using date-only comparison)
     const overdueTasks = state.tasks.filter(
-      task => !task.isCompleted && task.dueDate && task.dueDate < now
+      task => !task.isCompleted && task.dueDate && isTaskOverdue(task.dueDate, now)
     ).length;
 
-    // Due Today: tasks due within the next 24 hours
+    // Due Today: tasks due today (using date-only comparison)
     const dueTodayTasks = state.tasks.filter(task => {
       if (task.isCompleted || !task.dueDate) return false;
-      return task.dueDate >= now && task.dueDate < now + oneDayMs;
+      return isTaskDueToday(task.dueDate, now);
     }).length;
 
     // Oldest Task: age in days of the oldest task

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatCreatedDate, formatTaskAge, formatDueDate } from './utils';
+import { formatCreatedDate, formatTaskAge, formatDueDate, normalizeToStartOfDay, isTaskOverdue, isTaskDueToday, isTaskDueFuture } from './utils';
 
 describe('formatCreatedDate', () => {
   it('should format timestamp as "DD MMM"', () => {
@@ -103,5 +103,157 @@ describe('formatTaskAge', () => {
     // Created 6 days and 23 hours ago (should show "6 days")
     const createdAt = Date.now() - (6 * 24 * 60 * 60 * 1000 + 23 * 60 * 60 * 1000);
     expect(formatTaskAge(createdAt)).toBe('6 days');
+  });
+});
+
+describe('normalizeToStartOfDay', () => {
+  it('should normalize timestamp to midnight (00:00:00.000)', () => {
+    const timestamp = new Date('2026-01-15T14:30:45.123').getTime();
+    const normalized = normalizeToStartOfDay(timestamp);
+    const date = new Date(normalized);
+    
+    expect(date.getHours()).toBe(0);
+    expect(date.getMinutes()).toBe(0);
+    expect(date.getSeconds()).toBe(0);
+    expect(date.getMilliseconds()).toBe(0);
+  });
+
+  it('should keep the same calendar date', () => {
+    const timestamp = new Date('2026-01-15T23:59:59.999').getTime();
+    const normalized = normalizeToStartOfDay(timestamp);
+    const date = new Date(normalized);
+    
+    expect(date.getFullYear()).toBe(2026);
+    expect(date.getMonth()).toBe(0); // January (0-indexed)
+    expect(date.getDate()).toBe(15);
+  });
+
+  it('should handle already normalized timestamps', () => {
+    const timestamp = new Date('2026-01-15T00:00:00.000').getTime();
+    const normalized = normalizeToStartOfDay(timestamp);
+    
+    expect(normalized).toBe(timestamp);
+  });
+});
+
+describe('isTaskOverdue', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // Set current time to Jan 15, 2026, 14:30 (2:30 PM)
+    vi.setSystemTime(new Date('2026-01-15T14:30:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should return true for tasks due yesterday', () => {
+    const yesterday = new Date('2026-01-14T10:00:00.000').getTime();
+    expect(isTaskOverdue(yesterday)).toBe(true);
+  });
+
+  it('should return true for tasks due yesterday at midnight', () => {
+    const yesterday = new Date('2026-01-14T00:00:00.000').getTime();
+    expect(isTaskOverdue(yesterday)).toBe(true);
+  });
+
+  it('should return false for tasks due today at midnight', () => {
+    const today = new Date('2026-01-15T00:00:00.000').getTime();
+    expect(isTaskOverdue(today)).toBe(false);
+  });
+
+  it('should return false for tasks due today at 11:59 PM', () => {
+    const today = new Date('2026-01-15T23:59:59.999').getTime();
+    expect(isTaskOverdue(today)).toBe(false);
+  });
+
+  it('should return false for tasks due tomorrow', () => {
+    const tomorrow = new Date('2026-01-16T10:00:00.000').getTime();
+    expect(isTaskOverdue(tomorrow)).toBe(false);
+  });
+
+  it('should return true for tasks due multiple days ago', () => {
+    const pastDate = new Date('2026-01-10T15:00:00.000').getTime();
+    expect(isTaskOverdue(pastDate)).toBe(true);
+  });
+});
+
+describe('isTaskDueToday', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // Set current time to Jan 15, 2026, 14:30 (2:30 PM)
+    vi.setSystemTime(new Date('2026-01-15T14:30:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should return true for tasks due today at midnight', () => {
+    const today = new Date('2026-01-15T00:00:00.000').getTime();
+    expect(isTaskDueToday(today)).toBe(true);
+  });
+
+  it('should return true for tasks due today at 11:59 PM', () => {
+    const today = new Date('2026-01-15T23:59:59.999').getTime();
+    expect(isTaskDueToday(today)).toBe(true);
+  });
+
+  it('should return true for tasks due today at current time', () => {
+    const today = new Date('2026-01-15T14:30:00.000').getTime();
+    expect(isTaskDueToday(today)).toBe(true);
+  });
+
+  it('should return false for tasks due yesterday', () => {
+    const yesterday = new Date('2026-01-14T10:00:00.000').getTime();
+    expect(isTaskDueToday(yesterday)).toBe(false);
+  });
+
+  it('should return false for tasks due tomorrow', () => {
+    const tomorrow = new Date('2026-01-16T10:00:00.000').getTime();
+    expect(isTaskDueToday(tomorrow)).toBe(false);
+  });
+
+  it('should handle edge case: task at 00:00:00 when current time is late evening', () => {
+    vi.setSystemTime(new Date('2026-01-15T23:00:00.000Z'));
+    const today = new Date('2026-01-15T00:00:00.000').getTime();
+    expect(isTaskDueToday(today)).toBe(true);
+  });
+});
+
+describe('isTaskDueFuture', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // Set current time to Jan 15, 2026, 14:30 (2:30 PM)
+    vi.setSystemTime(new Date('2026-01-15T14:30:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should return true for tasks due tomorrow', () => {
+    const tomorrow = new Date('2026-01-16T10:00:00.000').getTime();
+    expect(isTaskDueFuture(tomorrow)).toBe(true);
+  });
+
+  it('should return true for tasks due tomorrow at midnight', () => {
+    const tomorrow = new Date('2026-01-16T00:00:00.000').getTime();
+    expect(isTaskDueFuture(tomorrow)).toBe(true);
+  });
+
+  it('should return false for tasks due today', () => {
+    const today = new Date('2026-01-15T10:00:00.000').getTime();
+    expect(isTaskDueFuture(today)).toBe(false);
+  });
+
+  it('should return false for tasks due yesterday', () => {
+    const yesterday = new Date('2026-01-14T10:00:00.000').getTime();
+    expect(isTaskDueFuture(yesterday)).toBe(false);
+  });
+
+  it('should return true for tasks due multiple days in the future', () => {
+    const futureDate = new Date('2026-01-20T15:00:00.000').getTime();
+    expect(isTaskDueFuture(futureDate)).toBe(true);
   });
 });
