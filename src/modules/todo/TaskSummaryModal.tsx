@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { Task, TodoList } from './types';
-import { isTaskOverdue, isTaskDueToday } from './utils';
+import { isTaskOverdue, isTaskDueToday, normalizeToStartOfDay } from './utils';
 import styles from './TaskSummaryModal.module.css';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -66,7 +66,11 @@ export function TaskSummaryModal({ title, filterType, onClose, onTaskClick }: Ta
   const formatDueDate = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffMs = timestamp - now.getTime();
+    
+    // Normalize dates to compare only the calendar date, not time
+    const dueDateNormalized = normalizeToStartOfDay(timestamp);
+    const todayNormalized = normalizeToStartOfDay(now.getTime());
+    const diffMs = dueDateNormalized - todayNormalized;
     const diffDays = Math.floor(diffMs / MILLISECONDS_PER_DAY);
 
     if (diffDays === 0) {
