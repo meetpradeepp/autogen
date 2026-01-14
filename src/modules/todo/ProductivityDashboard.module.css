@@ -22,17 +22,28 @@
 }
 
 .widget {
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: var(--shadow-md);
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .widget:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+  border-color: var(--border-secondary);
+}
+
+.widgetClickable {
+  cursor: pointer;
+}
+
+.widgetClickable:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover);
 }
 
 .widgetIcon {

@@ -1,5 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
+import { TaskSummaryModal } from './TaskSummaryModal';
+import { Task } from './types';
+import { TaskModal } from './EditTaskModal';
 import styles from './ProductivityDashboard.module.css';
 
 interface DashboardMetrics {
@@ -12,6 +15,11 @@ interface DashboardMetrics {
 
 export function ProductivityDashboard() {
   const { state } = useTaskContext();
+  const [modalState, setModalState] = useState<{
+    type: 'open' | 'overdue' | 'dueToday';
+    title: string;
+  } | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Calculate metrics with memoization for performance
   const metrics = useMemo<DashboardMetrics>(() => {
@@ -55,6 +63,23 @@ export function ProductivityDashboard() {
   // Empty state: no tasks and no lists
   const isEmpty = state.tasks.length === 0 && state.lists.length === 0;
 
+  const handleWidgetClick = (type: 'open' | 'overdue' | 'dueToday', title: string) => {
+    setModalState({ type, title });
+  };
+
+  const handleModalClose = () => {
+    setModalState(null);
+  };
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setModalState(null);
+  };
+
+  const handleTaskModalClose = () => {
+    setSelectedTask(null);
+  };
+
   if (isEmpty) {
     return (
       <div className={styles.container}>
@@ -75,19 +100,28 @@ export function ProductivityDashboard() {
     <div className={styles.container}>
       <h1 className={styles.title}>Productivity Dashboard</h1>
       <div className={styles.grid}>
-        <div className={styles.widget}>
+        <div
+          className={`${styles.widget} ${styles.widgetClickable}`}
+          onClick={() => handleWidgetClick('open', 'Open Tasks')}
+        >
           <div className={styles.widgetIcon}>📋</div>
           <div className={styles.widgetValue}>{metrics.openTasks}</div>
           <div className={styles.widgetLabel}>Open Tasks</div>
         </div>
 
-        <div className={styles.widget}>
+        <div
+          className={`${styles.widget} ${styles.widgetClickable}`}
+          onClick={() => handleWidgetClick('overdue', 'Overdue Tasks')}
+        >
           <div className={styles.widgetIcon}>⚠️</div>
           <div className={styles.widgetValue}>{metrics.overdueTasks}</div>
           <div className={styles.widgetLabel}>Overdue</div>
         </div>
 
-        <div className={styles.widget}>
+        <div
+          className={`${styles.widget} ${styles.widgetClickable}`}
+          onClick={() => handleWidgetClick('dueToday', 'Due Today')}
+        >
           <div className={styles.widgetIcon}>📅</div>
           <div className={styles.widgetValue}>{metrics.dueTodayTasks}</div>
           <div className={styles.widgetLabel}>Due Today</div>
@@ -107,6 +141,22 @@ export function ProductivityDashboard() {
           <div className={styles.widgetLabel}>Total Lists</div>
         </div>
       </div>
+
+      {modalState && (
+        <TaskSummaryModal
+          title={modalState.title}
+          filterType={modalState.type}
+          onClose={handleModalClose}
+          onTaskClick={handleTaskClick}
+        />
+      )}
+
+      {selectedTask && (
+        <TaskModal
+          task={selectedTask}
+          onClose={handleTaskModalClose}
+        />
+      )}
     </div>
   );
 }
