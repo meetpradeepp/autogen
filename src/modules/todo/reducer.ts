@@ -527,6 +527,33 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
       };
     }
 
+    case 'REORDER_LISTS': {
+      const { oldIndex, newIndex } = action.payload;
+      
+      // Validate indices
+      if (oldIndex < 0 || oldIndex >= state.lists.length || 
+          newIndex < 0 || newIndex >= state.lists.length) {
+        return state;
+      }
+      
+      // If indices are the same, no reordering needed
+      if (oldIndex === newIndex) {
+        return state;
+      }
+      
+      // Create a new array with reordered lists
+      const reorderedLists = [...state.lists];
+      const [movedList] = reorderedLists.splice(oldIndex, 1);
+      reorderedLists.splice(newIndex, 0, movedList);
+      
+      const newState = {
+        ...state,
+        lists: reorderedLists,
+      };
+      saveState(newState);
+      return newState;
+    }
+
     default:
       return state;
   }
