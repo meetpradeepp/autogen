@@ -78,6 +78,7 @@
   background: transparent;
   border-radius: 6px;
   transition: all 0.2s;
+  cursor: grab;
 }
 
 .listItem:hover {
@@ -91,10 +92,6 @@
 .listItem.dragging {
   opacity: 0.5;
   cursor: grabbing;
-}
-
-.listItem {
-  cursor: grab;
 }
 
 .listButton {

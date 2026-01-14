@@ -189,10 +189,13 @@ export function Sidebar() {
       const oldIndex = state.lists.findIndex((list) => list.id === active.id);
       const newIndex = state.lists.findIndex((list) => list.id === over.id);
 
-      dispatch({
-        type: 'REORDER_LISTS',
-        payload: { oldIndex, newIndex },
-      });
+      // Only dispatch if both indices are valid
+      if (oldIndex !== -1 && newIndex !== -1) {
+        dispatch({
+          type: 'REORDER_LISTS',
+          payload: { oldIndex, newIndex },
+        });
+      }
     }
   };
 
