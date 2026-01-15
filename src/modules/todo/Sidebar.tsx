@@ -52,11 +52,18 @@ function SortableListItem({ id, name, color, isActive, onSwitch, onDelete }: Sor
       style={style}
       className={`${styles.listItem} ${isActive ? styles.active : ''} ${isDragging ? styles.dragging : ''}`}
     >
+      <span
+        className={styles.dragHandle}
+        {...attributes}
+        {...listeners}
+        aria-label="Drag to reorder"
+        style={{ cursor: 'grab', padding: '0 4px', display: 'flex', alignItems: 'center' }}
+      >
+        ⋮⋮
+      </span>
       <button
         onClick={() => onSwitch(id)}
         className={styles.listButton}
-        {...attributes}
-        {...listeners}
       >
         <span 
           className={styles.colorDot} 
