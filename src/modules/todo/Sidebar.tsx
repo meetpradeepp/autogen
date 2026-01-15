@@ -56,8 +56,10 @@ function SortableListItem({ id, name, color, isActive, onSwitch, onDelete }: Sor
         className={styles.dragHandle}
         {...attributes}
         {...listeners}
+        role="button"
+        tabIndex={0}
         aria-label="Drag to reorder"
-        style={{ cursor: 'grab', padding: '0 4px', display: 'flex', alignItems: 'center' }}
+        title="Drag to reorder lists"
       >
         ⋮⋮
       </span>
