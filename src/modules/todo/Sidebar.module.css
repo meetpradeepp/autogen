@@ -78,7 +78,6 @@
   background: transparent;
   border-radius: 6px;
   transition: all 0.2s;
-  cursor: grab;
 }
 
 .listItem:hover {
@@ -91,6 +90,26 @@
 
 .listItem.dragging {
   opacity: 0.5;
+  cursor: grabbing;
+}
+
+.dragHandle {
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  font-size: 1rem;
+  user-select: none;
+}
+
+.dragHandle:hover {
+  opacity: 1;
+}
+
+.listItem.dragging .dragHandle {
   cursor: grabbing;
 }
 
