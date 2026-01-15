@@ -78,7 +78,6 @@
   background: transparent;
   border-radius: 6px;
   transition: all 0.2s;
-  cursor: grab;
 }
 
 .listItem:hover {
